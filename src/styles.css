@@ -1,0 +1,25 @@
+ :root {
+  font-family: system-ui, sans-serif;
+  color: #20252b;
+  background: #fafafa;
+  line-height: 1.6;
+  font-synthesis: none;
+}
+body { margin: 0; }
+main { max-width: 48rem; margin: 3rem auto; padding: 0 1.25rem; }
+h1 { line-height: 1.2; }
+section { margin-block: 2rem; }
+.day-buttons { display: flex; flex-wrap: wrap; gap: .75rem; }
+button {
+  font: inherit;
+  min-height: 44px;
+  padding: .5rem 1rem;
+  border: 1px solid #69737e;
+  border-radius: .25rem;
+  background: white;
+  color: inherit;
+  cursor: pointer;
+}
+button[aria-pressed="true"] { background: #20252b; color: white; }
+button:focus-visible { outline: 3px solid #236ecb; outline-offset: 3px; }
+@media (max-width: 40rem) { main { margin-block: 1.5rem; } }
