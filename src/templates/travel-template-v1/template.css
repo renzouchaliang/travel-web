@@ -603,4 +603,13 @@ body:has(.travel-template) {
 .nearby-pin .travel-map-dot { background:#67826c; border-radius:7px; }
 
 .travel-template .day-tabs button { color:var(--day-tab-color); background:var(--day-tab-bg); border-color:var(--day-tab-color); }
-.travel-template .day-tabs button[aria-selected="true"] { background:var(--day-tab-color); color:#fff; }
+.travel-template .day-tabs button[aria-selected="true"] { background:var(--day-tab-color); color:var(--day-tab-foreground, #fff); }
+
+.trip-header { background-size:cover; background-position:center; }
+.travel-template .map-controls { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+.travel-template .map-controls button { min-width:0; width:100%; padding:6px 3px; white-space:nowrap; font-size:13px; min-height:36px; }
+.travel-template .map-equivalent { font-size:12px; line-height:1.4; }
+.travel-template .map-equivalent summary { padding:5px 0; }
+.travel-template .map-equivalent button { min-height:28px; padding:4px 7px; margin:3px 0; font-size:12px; line-height:1.4; }
+
+.trip-header .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }

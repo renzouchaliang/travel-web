@@ -7,7 +7,8 @@ import { useTripSelection } from "./useTripSelection";
 import { TripMap, type AdapterFactory } from "./TripMap";
 import { ItineraryTimeline } from "./ItineraryTimeline";
 import { RestaurantList } from "./RestaurantList";
-import { ExternalLinks } from "./ExternalLinks";
+import { dayAppearance } from "./dayAppearance";
+import { ExternalLinks, safeUrl } from "./ExternalLinks";
 
 import { defaultConfig, themeVariables } from "./theme";
 import { scrollToSection } from "./accessibility";
@@ -36,8 +37,11 @@ const unavailableMap: AdapterFactory = () => ({
   destroy: () => {},
 });
 export function TripHeader({ trip, day }: { trip: Trip; day: Day }) {
+  const appearance = dayAppearance(day, trip.days.findIndex((d) => d.id === day.id));
+  const image = safeUrl(day.visual?.headerImage?.src);
   return (
-    <header className="trip-header">
+    <header className="trip-header" style={{ backgroundColor: appearance.accent, color: image ? "#fff" : appearance.foreground, backgroundImage: image ? `linear-gradient(#0008, #0008), url(${JSON.stringify(image)})` : undefined }}>
+      {image && <span className="sr-only">{day.visual?.headerImage?.alt}</span>}
       <h1>{trip.title}</h1>
       <p>
         {trip.days.length} 天

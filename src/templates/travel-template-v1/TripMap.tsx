@@ -236,7 +236,7 @@ export function TripMap({
     >
       <div className="map-heading"><h2>今天去哪里</h2>{mapExpanded && <button className="map-exit" onClick={close}>退出全屏 ✕</button>}</div>
       <p className="map-sequence-note">
-        点路段查看交通路线，点“全天”恢复。自由逛吃只标地点。
+        点路段查看交通路线，点“总览”恢复。自由逛吃只标地点。
       </p>
       <MapControls
         selection={selection}
@@ -270,7 +270,7 @@ export function TripMap({
         <p>当天暂无已核查坐标，不生成假地图点。</p>
       )}
       <div className="map-legend"><span className="legend-transit">公交／地铁</span><span className="legend-walk">步行路线</span><span>● 自由逛吃地点</span></div>
-      <details className="map-equivalent" key={`${activeDayId}:${visibleLayers.restaurants}:${visibleLayers.nearby}`} open={visibleLayers.restaurants || visibleLayers.nearby ? true : undefined}>
+      <details className="map-equivalent" key={`${activeDayId}:${visibleLayers.restaurants}:${visibleLayers.nearby}`}>
         <summary>地图地点的等效文字列表</summary>
         {visiblePlaces.map((p) => (
           <button

@@ -37,6 +37,7 @@ type ExportStop = RawStop & {
   };
 };
 type ExportDay = Omit<RawExport["trip"]["days"][number], "stops"> & {
+  visual?: Day["visual"];
   stops: ExportStop[] | null;
   nearbyPlaces?: Place[];
 };
@@ -284,6 +285,7 @@ export function adaptChangsha(input: ChangshaExport): Trip {
       date: day.date,
       title: day.title ?? "行程待补充",
       directionSummary: day.summary ?? "",
+      visual: day.visual,
       stops,
       legs,
       restaurantGroups: groups,

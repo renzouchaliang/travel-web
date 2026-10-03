@@ -64,6 +64,7 @@ export function PlaceCard({
   trip: Trip;
 }) {
   const stay = stop?.stayMinutes ?? place.suggestedStayMinutes;
+  const ticketLinks = place.ticket ? place.links.filter((l) => l.action === "booking" && ["美团", "飞猪", "携程"].includes(l.platform) && l.targetType === "detail") : [];
   return (
     <article
       id={stop ? `stop-${stop.id}` : undefined}
@@ -72,7 +73,7 @@ export function PlaceCard({
       {stop && <div className="stop-time"><strong>{stop.startTime ? `${stop.startTime}${stop.endTime ? `—${stop.endTime}` : ""}` : stop.timeLabel ?? (stop.role === "free-time" ? "时间自由" : "")}</strong>{stay && <span>建议游览 {stay.min}–{stay.max} 分钟</span>}</div>}
       <h3 className="place-title">{number && <span className="node-number">{number}</span>}{place.name}{place.branchName && ` · ${place.branchName}`}</h3>
       {stop?.visitPurpose && <span className="purpose-tag">{{ sightseeing: "游览", photo: "拍照打卡", museum: "场馆参观", park: "公园散步", "free-time": "自由活动" }[stop.visitPurpose]}</span>}
-      {place.kind === "attraction" && <div className="place-media"><PhotoGallery photos={place.photos} /><aside><strong>看看怎么逛</strong><ExternalLinks links={place.links.filter((l) => l.platform !== "高德")} /><small>景点介绍、照片与游客点评</small></aside></div>}
+      {place.kind === "attraction" && <div className="place-media"><PhotoGallery photos={place.photos} /><aside><strong>看看怎么逛</strong><ExternalLinks links={place.links.filter((l) => l.platform !== "高德" && !ticketLinks.includes(l))} /><small>景点介绍、照片与游客点评</small></aside></div>}
       <p>{stop?.description ?? place.summary}</p>
       {stop?.note && <p>{stop.note}</p>}
       {place.openingMilestones && <div className="opening-milestones">{place.openingMilestones.map((item) => <div key={item.label}><strong>{item.time}</strong><span>{item.label}</span></div>)}</div>}
@@ -99,6 +100,7 @@ export function PlaceCard({
             </details>
           ),
       )}
+      {!!ticketLinks.length && <div className="card-actions ticket-actions" aria-label="景点购票"><ExternalLinks links={ticketLinks} platformLabels /></div>}
       <div className="card-actions">
       <ExternalLinks links={place.kind === "attraction" ? place.links.filter((l) => l.action === "location") : place.links} />
         <button className="compact-map-button" onClick={onMap}>在地图看</button>

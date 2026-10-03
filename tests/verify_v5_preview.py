@@ -20,6 +20,20 @@ with sync_playwright() as p:
   assert page.locator('.day-tabs [role=tab]').count()==4
   colors=page.locator('.day-tabs [role=tab]').evaluate_all('(els)=>els.map(e=>getComputedStyle(e).getPropertyValue("--day-tab-color"))')
   assert len(set(colors))==4
+  assert page.locator('.map-controls button').all_inner_texts()==['总览','全屏','餐饮点','探索']
+  boxes=[button.bounding_box() for button in page.locator('.map-controls button').all()]
+  assert len(set(round(box['y']) for box in boxes))==1
+  assert page.locator('.map-equivalent').get_attribute('open') is None
+  assert page.get_by_role('link',name='在美团搜索').count()==4
+  assert page.locator('#stop-d1-academy .ticket-actions').count()==0
+  header_colors=[]
+  for tab in page.locator('.day-tabs [role=tab]').all():
+   tab.click()
+   accent=tab.evaluate('(e)=>getComputedStyle(e).getPropertyValue("--day-tab-color").trim()')
+   header_colors.append(page.locator('.trip-header').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
+   assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundColor')==tab.evaluate('(e)=>{const d=document.createElement("div");d.style.color=getComputedStyle(e).getPropertyValue("--day-tab-color");return d.style.color}')
+  assert len(set(header_colors))==4
+  page.locator('.day-tabs [role=tab]').first.click()
   assert page.get_by_role('button',name='展开地图',exact=True).count()==0
   assert page.get_by_role('button',name='收起地图',exact=True).count()==0
   from urllib.parse import urlparse,parse_qs
@@ -37,11 +51,11 @@ with sync_playwright() as p:
   assert page.evaluate('window.mapChecks.interactive')
   assert page.locator('.map-canvas').evaluate('(e)=>getComputedStyle(e).touchAction')=='none'
   assert page.get_by_role('button',name='操作地图',exact=True).count()==0
-  page.get_by_role('button',name='周边有趣地点',exact=True).click()
+  page.get_by_role('button',name='探索',exact=True).click()
   assert page.locator('.nearby-pin').count()==3
-  assert page.locator('.map-equivalent').get_attribute('open') is not None
+  assert page.locator('.map-equivalent').get_attribute('open') is None
   assert len(page.evaluate('window.mapChecks.lines'))==2
-  page.get_by_role('button',name='周边有趣地点',exact=True).click()
+  page.get_by_role('button',name='探索',exact=True).click()
   assert page.locator('.nearby-pin').count()==0
   assert page.locator('.restaurant-row h4 button, .restaurant-row h4 a').count()==0
   assert '大众点评 · 大众点评' not in page.locator('.restaurant-group').inner_text()
@@ -84,11 +98,11 @@ with sync_playwright() as p:
   assert page.locator('#stop-d1-academy .place-title-button').count()==0
   page.locator('.day-tabs [role=tab]').nth(2).click();assert page.get_by_text('这一天的行程待补充').is_visible();assert page.locator('.place-card').count()==0
   page.locator('.day-tabs [role=tab]').nth(1).click();assert page.locator('.place-card').count()>0
-  page.locator('.day-tabs [role=tab]').first.click();page.get_by_role('button',name='放大地图',exact=True).click();assert page.get_by_role('dialog').count()==1; assert page.get_by_role('button',name='退出全屏 ✕').is_visible(); assert page.locator('.map-canvas-wrap').bounding_box()['height']>650; page.get_by_role('button',name='放大一级').click(); assert page.evaluate('window.mapChecks.zoom')>=16; page.screenshot(path=f'/tmp/travel-map-full-{width}.png');page.keyboard.press('Escape');assert page.get_by_role('dialog').count()==0
+  page.locator('.day-tabs [role=tab]').first.click();page.get_by_role('button',name='全屏',exact=True).click();assert page.get_by_role('dialog').count()==1; assert page.get_by_role('button',name='退出全屏 ✕').is_visible(); assert page.locator('.map-canvas-wrap').bounding_box()['height']>650; page.get_by_role('button',name='放大一级').click(); assert page.evaluate('window.mapChecks.zoom')>=16; page.screenshot(path=f'/tmp/travel-map-full-{width}.png');page.keyboard.press('Escape');assert page.get_by_role('dialog').count()==0
   page.screenshot(path=f'/tmp/travel-v5-{width}.png',full_page=True)
   if width==390:
    page.set_viewport_size({'width':844,'height':390})
-   page.get_by_role('button',name='放大地图',exact=True).click()
+   page.get_by_role('button',name='全屏',exact=True).click()
    assert page.locator('.map-canvas-wrap').bounding_box()['height']>280
    page.get_by_role('button',name='退出全屏 ✕').click()
    assert page.get_by_role('dialog').count()==0
@@ -98,10 +112,26 @@ with sync_playwright() as p:
   page.locator('#nearby .nearby-row').nth(1).locator('summary').click()
   page.locator('#nearby .nearby-row').nth(1).get_by_role('button',name='在地图看',exact=True).click()
   assert page.locator('.day-tabs [role=tab]').first.get_attribute('aria-selected')=='true'
-  assert page.get_by_role('button',name='周边有趣地点').get_attribute('aria-pressed')=='true'
+  assert page.get_by_role('button',name='探索').get_attribute('aria-pressed')=='true'
   assert page.locator('.nearby-pin.active .travel-map-label').inner_text()=='自卑亭'
-  page.get_by_role('button',name='查看全天',exact=True).click()
+  page.get_by_role('button',name='总览',exact=True).click()
   assert not page.locator('.travel-map-pin.active').count()
+  if width==1440:
+   page.evaluate("""async () => {
+     const moduleUrl=performance.getEntriesByType('resource').find((e)=>e.name.includes('/changsha-2026/adapter.ts')).name;
+     const {changshaTrip}=await import(moduleUrl);
+     changshaTrip.days[0].visual={themeColor:'#ddbb66',headerImage:{src:'https://example.org/test-header.jpg',alt:'测试代表性图片'}};
+     for(const platform of ['美团','飞猪','携程']) changshaTrip.places.academy.links.push({id:'test-'+platform,platform,action:'booking',targetType:'detail',label:'买票',url:'https://example.org/ticket/'+encodeURIComponent(platform)});
+   }""")
+   page.locator('.day-tabs [role=tab]').nth(1).click()
+   page.locator('.day-tabs [role=tab]').first.click()
+   assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundColor')=='rgb(221, 187, 102)'
+   assert 'test-header.jpg' in page.locator('.trip-header').evaluate('(e)=>e.style.backgroundImage')
+   assert page.locator('#stop-d1-academy .ticket-actions a').count()==3
+   assert [a.inner_text().strip() for a in page.locator('#stop-d1-academy .ticket-actions a').all()]==['美团 ↗','飞猪 ↗','携程 ↗']
+   assert page.locator('#stop-d1-academy .place-media a[href*="example.org/ticket"]').count()==0
+   page.locator('.day-tabs [role=tab]').nth(1).click()
+   assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundImage')==''
   assert not errors,errors
   print('PASS',width,'four days, blank date, V5 media, dining, modal, real route calls, station excluded')
   page.close()

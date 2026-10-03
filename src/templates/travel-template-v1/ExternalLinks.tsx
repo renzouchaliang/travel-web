@@ -8,7 +8,7 @@ export function safeUrl(url?: string): string | undefined {
     return;
   }
 }
-export function ExternalLinks({ links }: { links: ExternalLink[] }) {
+export function ExternalLinks({ links, maxVisible = 3, platformLabels = false }: { links: ExternalLink[]; maxVisible?: number; platformLabels?: boolean }) {
   const valid = links.filter((l) => safeUrl(l.url));
   const render = (l: ExternalLink) => (
     <a
@@ -17,15 +17,17 @@ export function ExternalLinks({ links }: { links: ExternalLink[] }) {
       target="_blank"
       rel="noopener noreferrer"
     >
-      {l.targetType === "search"
+      {l.action === "location"
+        ? <><span aria-hidden="true">📍</span> 地图打开</>
+        : platformLabels && l.targetType === "detail"
+          ? l.platform
+          : l.targetType === "search"
         ? `在${l.platform}搜索`
         : l.targetType === "home"
           ? `${l.platform}首页`
           : l.action === "navigation" && l.navigationIntent === "planned"
             ? `${l.platform}地图导航`
-            : l.action === "location"
-              ? `${l.platform}地图打开`
-              : l.action === "navigation" &&
+            : l.action === "navigation" &&
                 l.navigationIntent === "current-location"
               ? `${l.platform} · 从当前位置出发`
               : l.label.replace(/^(大众点评|携程|马蜂窝|美团)\s*[·・]\s*\1$/, "$1")}{" "}
@@ -34,11 +36,11 @@ export function ExternalLinks({ links }: { links: ExternalLink[] }) {
   );
   return (
     <div className="external-links">
-      {valid.slice(0, 3).map(render)}
-      {valid.length > 3 && (
+      {valid.slice(0, maxVisible).map(render)}
+      {valid.length > maxVisible && (
         <details>
           <summary>更多参考</summary>
-          {valid.slice(3).map(render)}
+          {valid.slice(maxVisible).map(render)}
         </details>
       )}
     </div>

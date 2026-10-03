@@ -33,24 +33,10 @@ export function MapControls({
 }) {
   return (
     <div className="map-controls">
-      <button onClick={selection.overview}>查看全天</button>
-      <button
-        aria-pressed={selection.visibleLayers.restaurants}
-        onClick={() => selection.toggleLayer("restaurants")}
-      >
-        餐饮点
-      </button>
-      <button
-        aria-pressed={selection.visibleLayers.nearby}
-        onClick={() => selection.toggleLayer("nearby")}
-      >
-        周边有趣地点
-      </button>
-      <button className="map-expand-toggle" onClick={() => selection.setMapExpanded(!selection.mapExpanded)}>
-        {selection.mapExpanded ? "关闭全屏地图" : "放大地图"}
-      </button>
-
-
+      <button onClick={selection.overview}>总览</button>
+      <button className="map-expand-toggle" aria-pressed={selection.mapExpanded} onClick={() => selection.setMapExpanded(!selection.mapExpanded)}>全屏</button>
+      <button aria-pressed={selection.visibleLayers.restaurants} onClick={() => selection.toggleLayer("restaurants")}>餐饮点</button>
+      <button aria-pressed={selection.visibleLayers.nearby} onClick={() => selection.toggleLayer("nearby")}>探索</button>
     </div>
   );
 }
