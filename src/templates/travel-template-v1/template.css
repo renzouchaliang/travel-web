@@ -454,3 +454,18 @@ body:has(.travel-template) {
 .transit-leg.mode-cycle {
   border-left-color: var(--travel-walk);
 }
+
+/* On phones all days stay visible without a sideways swipe. */
+@media (max-width: 767px) {
+  .day-tabs {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+  .day-tabs button {
+    width: 100%;
+    min-height: 48px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
+}
