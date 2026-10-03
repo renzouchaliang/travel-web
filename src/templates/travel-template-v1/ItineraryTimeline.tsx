@@ -27,7 +27,7 @@ export function TransitLegCard({
   return (
     <article
       id={`leg-${leg.id}`}
-      className={`transit-leg mode-${leg.mode} ${selected ? "selected" : ""}`}
+      className={`travel-card transit-leg mode-${leg.mode} ${selected ? "selected" : ""}`}
     >
       <p className="transit-heading">{leg.preferredLine && <span className="line-badge" style={{ background: leg.lineColor } as CSSProperties}>{leg.preferredLine}</span>} {name(leg.fromStopId)} → {name(leg.toStopId)}</p>
       <p>{leg.summary}</p>

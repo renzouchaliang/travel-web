@@ -64,7 +64,6 @@ const gcj = (c?: Coordinate) => {
 export class AMapAdapter implements MapAdapter {
   readonly provider = "amap";
   readonly displayMode = "planned" as const;
-  private popup?: SDK;
   get cacheTtlMs() {
     return this.config.cacheTtlMs ?? 0;
   }
@@ -81,10 +80,9 @@ export class AMapAdapter implements MapAdapter {
   private zoomChanged = () => {
     const zoom = this.map?.getZoom?.() ?? 12;
     for (const { marker, element, selected } of this.diningMarkers) {
-      const visible = zoom >= 15 || selected;
-      if (visible) marker.show?.(); else marker.hide?.();
-      element.hidden = !visible;
-      element.classList.toggle("show-name", zoom >= 17 || selected);
+      marker.show?.();
+      element.hidden = false;
+      element.classList.toggle("show-name", zoom >= 14 || selected);
     }
   };
   constructor(private config: AMapConfig) {}
@@ -129,10 +127,9 @@ export class AMapAdapter implements MapAdapter {
     places: Place[],
     results: RouteResult[],
     selectedPlaceId?: string,
-    scene?: MapScene,
+    _scene?: MapScene,
   ) {
     if (!this.map || !this.sdk || this.disposed) return;
-    this.popup?.close();
     this.map.remove(this.overlays);
     this.overlayCleanup.forEach((cleanup) => cleanup());
     this.overlayCleanup = [];
@@ -157,7 +154,7 @@ export class AMapAdapter implements MapAdapter {
       element.append(dot, label);
       const marker = new this.sdk!.Marker({
         position: gcj(p.coordinate), content: element, anchor: "bottom-center",
-        zIndex: dining ? 80 : selected ? 220 : 150,
+        zIndex: selected ? 220 : dining ? 80 : 150,
       });
       const select = () => this.select?.(p.id);
       // DOM click supports keyboard activation of the button as well as touch.
@@ -179,47 +176,20 @@ export class AMapAdapter implements MapAdapter {
     }
     this.map.add(this.overlays);
     this.zoomChanged();
-    const selected = places.find(
-      (p) => p.id === selectedPlaceId && p.coordinate?.crs === "GCJ02",
-    );
-    if (selected) {
-      // Build popup text with DOM APIs: trip text must never become supplier HTML.
-      const content = document.createElement("div");
-      content.className = "map-place-popup";
-      const heading = document.createElement("strong");
-      heading.textContent = selected.name;
-      content.append(heading);
-      const visits = scene?.visits[selected.id] ?? [];
-      for (const visit of visits) {
-        const time = document.createElement("p");
-        time.textContent = visit.time;
-        const description = document.createElement("p");
-        description.textContent =
-          visit.description.length > 180
-            ? visit.description.slice(0, 180) + "…"
-            : visit.description;
-        if (visit.time) content.append(time);
-        if (description.textContent) content.append(description);
-      }
-      if (!visits.length) {
-        const description = document.createElement("p");
-        description.textContent =
-          selected.kind === "restaurant" ? [selected.foodTags?.join(" / "), selected.address].filter(Boolean).join(" · ") : selected.summary ?? "";
-        content.append(description);
-      }
-      this.popup ??= new this.sdk.InfoWindow({ autoMove: false });
-      this.popup!.setContent(content);
-      this.popup!.open(this.map, gcj(selected.coordinate));
-    }
   }
-  fit(coordinates: Coordinate[]) {
+  fit(coordinates: Coordinate[], pointZoom = 15) {
     if (!this.map || !this.sdk) return;
     const c = coordinates.filter((c) => c.crs === "GCJ02");
-    if (c.length === 1) this.map.setZoomAndCenter(15, gcj(c[0]));
+    if (c.length === 1) this.map.setZoomAndCenter(pointZoom, gcj(c[0]));
     else if (c.length > 1) {
       const markers = c.map((p) => new this.sdk!.Marker({ position: gcj(p) }));
       this.map.setFitView(markers, false, [50, 50, 50, 50]);
     }
+  }
+  zoomBy(delta: number) {
+    if (!this.map || this.disposed) return;
+    const [min, max] = this.map.getZooms?.() ?? [3, 20];
+    this.map.setZoom(Math.max(min, Math.min(max, this.map.getZoom() + delta)));
   }
   interaction(enabled: boolean) {
     this.map?.setStatus({
@@ -380,8 +350,6 @@ export class AMapAdapter implements MapAdapter {
     this.planners.forEach((p) => p.clear?.());
     this.planners.clear();
     this.overlays = [];
-    this.popup?.close();
-    this.popup = undefined;
     this.map?.off?.("zoomend", this.zoomChanged);
     this.diningMarkers = [];
     this.map?.destroy();

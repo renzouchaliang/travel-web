@@ -27,7 +27,8 @@ export interface MapAdapter {
     selectedPlaceId?: string,
     scene?: MapScene,
   ): void;
-  fit(coordinates: Coordinate[]): void;
+  fit(coordinates: Coordinate[], pointZoom?: number): void;
+  zoomBy?(delta: number): void;
   interaction(enabled: boolean): void;
   resize(): void;
   route(request: RouteRequest, signal: AbortSignal): Promise<RouteResult>;

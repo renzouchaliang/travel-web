@@ -70,7 +70,7 @@ export function PlaceCard({
       className={`travel-card place-card card-${stop?.transport ? stop.transport.direction : place.kind} ${selected ? "selected" : ""}`}
     >
       {stop && <div className="stop-time"><strong>{stop.startTime ? `${stop.startTime}${stop.endTime ? `—${stop.endTime}` : ""}` : stop.timeLabel ?? (stop.role === "free-time" ? "时间自由" : "")}</strong>{stay && <span>建议游览 {stay.min}–{stay.max} 分钟</span>}</div>}
-      <h3 className="place-title">{number && <span className="node-number">{number}</span>}<button className="place-title-button" onClick={onMap} aria-label={`在地图看${place.name}`}>{place.name}{place.branchName && ` · ${place.branchName}`}<span aria-hidden="true" className="inline-map-icon">⌖</span></button></h3>
+      <h3 className="place-title">{number && <span className="node-number">{number}</span>}{place.name}{place.branchName && ` · ${place.branchName}`}</h3>
       {stop?.visitPurpose && <span className="purpose-tag">{{ sightseeing: "游览", photo: "拍照打卡", museum: "场馆参观", park: "公园散步", "free-time": "自由活动" }[stop.visitPurpose]}</span>}
       {place.kind === "attraction" && <div className="place-media"><PhotoGallery photos={place.photos} /><aside><strong>看看怎么逛</strong><ExternalLinks links={place.links.filter((l) => l.platform !== "高德")} /><small>景点介绍、照片与游客点评</small></aside></div>}
       <p>{stop?.description ?? place.summary}</p>
@@ -99,7 +99,10 @@ export function PlaceCard({
             </details>
           ),
       )}
+      <div className="card-actions">
       <ExternalLinks links={place.kind === "attraction" ? place.links.filter((l) => l.action === "navigation") : place.links} />
+        <button className="compact-map-button" onClick={onMap}>在地图看</button>
+      </div>
 
     </article>
   );

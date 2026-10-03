@@ -6,7 +6,7 @@ import { dayMapScene } from "../../maps/sequence";
 import { routeCacheKey } from "../../maps/MapAdapter";
 import type { TripSelection } from "./useTripSelection";
 import { useModal } from "./accessibility";
-import { MapControls, MapStatus, PlacePreview, RoutePanel } from "./MapParts";
+import { MapControls, MapStatus, RoutePanel } from "./MapParts";
 export type AdapterFactory = () => MapAdapter;
 export function TripMap({
   trip,
@@ -207,6 +207,7 @@ export function TripMap({
       ids
         .map((id) => trip.places[id].coordinate)
         .filter((c): c is Coordinate => !!c),
+      viewportIntent.kind === "place" && viewportIntent.id && trip.places[viewportIntent.id].kind === "restaurant" ? 16 : 15,
     );
     // Late geometry only updates overlays, never the user's viewport.
   }, [viewportIntent, status, day, trip]);
@@ -255,6 +256,10 @@ export function TripMap({
           className="map-canvas"
           aria-label="地图，可使用下方地点列表获取等效信息"
         />
+        <div className="map-zoom-buttons" role="group" aria-label="地图缩放">
+          <button aria-label="放大一级" disabled={status !== "ready" || !adapter.current?.zoomBy} onClick={() => { selection.userDrag(); adapter.current?.zoomBy?.(1); }}>＋</button>
+          <button aria-label="缩小一级" disabled={status !== "ready" || !adapter.current?.zoomBy} onClick={() => { selection.userDrag(); adapter.current?.zoomBy?.(-1); }}>−</button>
+        </div>
         {status !== "ready" && (
           <MapStatus status={status} onRetry={() => setAttempt((v) => v + 1)} />
         )}
@@ -283,12 +288,6 @@ export function TripMap({
           </button>
         ))}
       </details>
-      <PlacePreview
-        trip={trip}
-        day={day}
-        selection={selection}
-        onItinerary={onItinerary}
-      />
       <RoutePanel
         trip={trip}
         day={day}

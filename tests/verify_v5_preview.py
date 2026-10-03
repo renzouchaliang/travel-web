@@ -1,10 +1,10 @@
 from playwright.sync_api import sync_playwright
 MOCK='''(() => {
-window.mapChecks={queries:[],fits:[],lines:[],markers:[],zoom:12,events:{}};
+window.mapChecks={queries:[],fits:[],lines:[],markers:[],zoom:12,events:{},popups:0};
 class Marker {constructor(o){this.o=o;} on(){} off(){} setzIndex(){} show(){if(this.o.content)this.o.content.hidden=false;} hide(){if(this.o.content)this.o.content.hidden=true;}}
 class Polyline {constructor(o){this.o=o;}}
-class Map {constructor(el){this.el=el;} on(n,f){if(n==='complete')queueMicrotask(f);window.mapChecks.events[n]=f;} off(n){delete window.mapChecks.events[n];} getZoom(){return window.mapChecks.zoom;} remove(){window.mapChecks.lines=[];this.el.replaceChildren();} add(items){window.mapChecks.lines=items.filter(x=>x instanceof Polyline).map(x=>x.o);window.mapChecks.markers=items.filter(x=>x instanceof Marker).map(x=>x.o); for(const marker of window.mapChecks.markers)if(marker.content)this.el.append(marker.content);} setFitView(ms){window.mapChecks.fits.push(ms.map(m=>m.o.position));} setZoomAndCenter(z,p){window.mapChecks.zoom=z;window.mapChecks.fits.push([p]);window.mapChecks.events.zoomend?.();} setStatus(){} resize(){} destroy(){this.el.replaceChildren();}}
-class InfoWindow {setContent(){} open(){} close(){}}
+class Map {constructor(el){this.el=el;} on(n,f){if(n==='complete')queueMicrotask(f);window.mapChecks.events[n]=f;} off(n){delete window.mapChecks.events[n];} getZoom(){return window.mapChecks.zoom;} getZooms(){return [3,20];} setZoom(z){window.mapChecks.zoom=z;window.mapChecks.events.zoomend?.();} remove(){window.mapChecks.lines=[];this.el.replaceChildren();} add(items){window.mapChecks.lines=items.filter(x=>x instanceof Polyline).map(x=>x.o);window.mapChecks.markers=items.filter(x=>x instanceof Marker).map(x=>x.o); for(const marker of window.mapChecks.markers)if(marker.content)this.el.append(marker.content);} setFitView(ms){window.mapChecks.fits.push(ms.map(m=>m.o.position));} setZoomAndCenter(z,p){window.mapChecks.zoom=z;window.mapChecks.fits.push([p]);window.mapChecks.events.zoomend?.();} setStatus(){} resize(){} destroy(){this.el.replaceChildren();}}
+class InfoWindow {constructor(){window.mapChecks.popups++;} setContent(){} open(){} close(){}}
 
 class Planner {constructor(o){} clear(){} search(a,b,cb){window.mapChecks.queries.push([a,b]); queueMicrotask(()=>cb('complete',{routes:[{steps:[{path:[a,b]}],time:900,distance:1000}],plans:[{segments:[{transit_mode:'SUBWAY',transit:{path:[a,b],lines:[{name:'地铁4号线'}]}}],time:1800,distance:4000}]}));}}
 class Transfer extends Planner {search(a,b,cb){super.search(a,b,(status,data)=>cb(status,{plans:data.plans}));}}
@@ -30,21 +30,34 @@ with sync_playwright() as p:
   assert page.locator('.travel-map-label').filter(has_text='酒店').count()==1
   page.get_by_role('button',name='餐饮点',exact=True).click()
   page.locator('.travel-map-dining').first.wait_for(state='attached')
-  assert page.locator('.travel-map-dining:visible').count()==0
-  page.evaluate("window.mapChecks.zoom=15;window.mapChecks.events.zoomend()")
+  assert page.locator('.travel-map-dining:visible').count()==4
   assert page.locator('.travel-map-dining:visible').count()==4
   assert page.locator('.travel-map-dining .travel-map-label:visible').count()==0
-  page.evaluate("window.mapChecks.zoom=17;window.mapChecks.events.zoomend()")
+  page.evaluate("window.mapChecks.zoom=14;window.mapChecks.events.zoomend()")
   assert page.locator('.travel-map-dining .travel-map-label:visible').count()==4
   assert '（' not in page.locator('.travel-map-dining').first.inner_text()
   page.locator('.dining-tabs [role=tab]').nth(1).click()
   assert page.locator('.restaurant-group').count()==1
   assert page.locator('.restaurant-group .restaurant-row').count()==4
-  page.locator('#stop-d1-academy .place-title-button').click()
+  page.locator('#stop-d1-academy .compact-map-button').click()
   assert page.locator('.travel-map-pin.active').count()==1
+  assert page.evaluate('window.mapChecks.popups')==0
+  assert page.locator('.place-preview').count()==0
+  before_zoom=page.evaluate('window.mapChecks.zoom')
+  page.get_by_role('button',name='放大一级',exact=True).click()
+  assert page.evaluate('window.mapChecks.zoom')==before_zoom+1
+  page.get_by_role('button',name='缩小一级',exact=True).click()
+  assert page.evaluate('window.mapChecks.zoom')==before_zoom
+  page.locator('.dining-tabs [role=tab]').nth(2).click()
+  page.locator('.restaurant-group .restaurant-title-button').first.click()
+  assert page.evaluate('window.mapChecks.zoom')==16
+  assert page.locator('.travel-map-dining.active .travel-map-label').is_visible()
+  assert page.evaluate('window.mapChecks.popups')==0
+  assert page.locator('#leg-d1-l2').evaluate('(e)=>getComputedStyle(e).backgroundColor')!='rgba(0, 0, 0, 0)'
+  assert page.locator('#stop-d1-academy .place-title-button').count()==0
   page.locator('.day-tabs [role=tab]').nth(2).click();assert page.get_by_text('这一天的行程待补充').is_visible();assert page.locator('.place-card').count()==0
   page.locator('.day-tabs [role=tab]').nth(1).click();assert page.locator('.place-card').count()>0
-  page.locator('.day-tabs [role=tab]').first.click();page.get_by_role('button',name='放大地图',exact=True).click();assert page.get_by_role('dialog').count()==1; assert page.get_by_role('button',name='退出全屏 ✕').is_visible(); assert page.locator('.map-canvas-wrap').bounding_box()['height']>650; page.screenshot(path=f'/tmp/travel-map-full-{width}.png');page.keyboard.press('Escape');assert page.get_by_role('dialog').count()==0
+  page.locator('.day-tabs [role=tab]').first.click();page.get_by_role('button',name='放大地图',exact=True).click();assert page.get_by_role('dialog').count()==1; assert page.get_by_role('button',name='退出全屏 ✕').is_visible(); assert page.locator('.map-canvas-wrap').bounding_box()['height']>650; page.get_by_role('button',name='放大一级').click(); assert page.evaluate('window.mapChecks.zoom')>=16; page.screenshot(path=f'/tmp/travel-map-full-{width}.png');page.keyboard.press('Escape');assert page.get_by_role('dialog').count()==0
   page.screenshot(path=f'/tmp/travel-v5-{width}.png',full_page=True)
   if width==390:
    page.set_viewport_size({'width':844,'height':390})

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Day, RestaurantGroup, Trip } from "../../types/travel";
-import { ExternalLinks } from "./ExternalLinks";
+import { ExternalLinks, safeUrl } from "./ExternalLinks";
 export function sortedCandidates(
   group: RestaurantGroup,
   trip: Trip,
@@ -41,9 +41,11 @@ export function RestaurantRow({
 }) {
   const p = trip.places[candidate.placeId],
     d = candidate.distance;
+  const detailLink = p.links.find((link) => link.action === "reviews" && safeUrl(link.url)) ?? p.links.find((link) => safeUrl(link.url));
+  const title = <>{p.name}{p.branchName && ` · ${p.branchName}`}</>;
   return (
     <article className="restaurant-row">
-      <h4><button className="restaurant-title-button" onClick={onMap} aria-label={`在地图看${p.name}`}>{p.name}{p.branchName && ` · ${p.branchName}`} <span aria-hidden="true" className="inline-map-icon">⌖</span></button></h4>
+      <h4>{p.coordinate ? <button className="restaurant-title-button" onClick={onMap} aria-label={`在地图看${p.name}`}>{title}</button> : detailLink ? <a className="restaurant-title-button" href={safeUrl(detailLink.url)} target="_blank" rel="noopener noreferrer">{title}</a> : title}</h4>
       <p>
         {p.foodTags?.join(" / ")} · {p.address ?? p.areaId ?? "区域暂无"}
       </p>
@@ -66,7 +68,7 @@ export function RestaurantList({
   const [activeGroups, setActiveGroups] = useState<Record<string, string>>({});
   const active = day.restaurantGroups.find((g) => g.id === activeGroups[day.id]) ?? day.restaurantGroups[0];
   const choose = (id: string) => setActiveGroups((v) => ({ ...v, [day.id]: id }));
-  return <section id="dining"><h2>沿途吃什么</h2><p>按所在位置选一家，点击店名在地图看。</p>
+  return <section id="dining"><h2>沿途吃什么</h2><p>按所在位置选一家，点击店名查看位置或门店详情。</p>
     <div className="dining-tabs" role="tablist" aria-label="附近餐饮区域">{day.restaurantGroups.map((g, i) => <button key={g.id} id={`dining-tab-${day.id}-${g.id}`} role="tab" aria-selected={active?.id === g.id} aria-controls={`dining-panel-${day.id}`} tabIndex={active?.id === g.id ? 0 : -1} onClick={() => choose(g.id)} onKeyDown={(e) => {
       let next = i;
       if (e.key === "ArrowRight") next = (i + 1) % day.restaurantGroups.length;

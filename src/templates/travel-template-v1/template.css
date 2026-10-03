@@ -582,3 +582,16 @@ body:has(.travel-template) {
 .travel-map-dining .travel-map-label { position:absolute; left:12px; top:-5px; }
 .map-place-popup { font-size:13px; line-height:1.45; max-width:230px; }
 .map-place-popup p { margin:5px 0; }
+/* Explicit zoom works on desktop and in the same fullscreen map instance. */
+.map-zoom-buttons { position:absolute; right:12px; bottom:18px; z-index:10; display:flex; flex-direction:column; background:#fff; border:1px solid var(--travel-border); border-radius:9px; box-shadow:0 2px 8px #183d4025; overflow:hidden; }
+.travel-template .map-zoom-buttons button { width:40px; height:40px; min-height:40px; padding:0; border:0; border-radius:0; font-size:24px; color:var(--travel-primary); background:white; }
+.travel-template .map-zoom-buttons button + button { border-top:1px solid var(--travel-border); }
+.map-zoom-buttons button:disabled { opacity:.45; }
+.card-actions { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:10px; }
+.card-actions .external-links { display:contents; }
+.travel-template .card-actions a, .travel-template .compact-map-button { min-height:32px; padding:5px 8px; font-size:12px; line-height:1.4; }
+.layout-stacked .transit-leg { margin:0 0 12px; padding:14px 16px; background:#edf0f8; border:1px solid #dce0ed; border-left:3px solid var(--travel-transit); border-radius:14px; color:#526169; }
+.layout-stacked .transit-leg.mode-walk { background:#fff6ee; border-color:#f1dfcf; border-left-color:var(--travel-walk); }
+.layout-stacked .transit-leg.mode-drive, .layout-stacked .transit-leg.mode-taxi { background:#eef5f4; border-color:#d5e4e0; border-left-color:var(--travel-primary); }
+.transit-leg .transit-heading { color:var(--travel-primary); margin:0 0 8px; }
+.travel-template .transit-leg button { min-height:32px; font-size:12px; padding:4px 8px; }
