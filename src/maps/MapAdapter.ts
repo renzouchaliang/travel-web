@@ -6,7 +6,15 @@ export interface RouteRequest {
   to: Place;
   via: Place[];
 }
+export interface MapScene {
+  sequence: { crs: Coordinate["crs"]; path: Coordinate[] }[];
+  visits: Record<
+    string,
+    { stopId: string; time: string; description: string }[]
+  >;
+}
 export interface MapAdapter {
+  readonly displayMode?: "sequence" | "planned";
   readonly provider: string;
   readonly cacheTtlMs?: number; // Only enable within confirmed provider terms.
   mount(
@@ -17,6 +25,7 @@ export interface MapAdapter {
     places: Place[],
     results: RouteResult[],
     selectedPlaceId?: string,
+    scene?: MapScene,
   ): void;
   fit(coordinates: Coordinate[]): void;
   interaction(enabled: boolean): void;

@@ -33,18 +33,20 @@ The included Changsha demo is based only on the route sequence in the specificat
 
 `MapAdapter` exposes mount, render, fit, gesture enablement, resize, route lookup, and destroy; normalized route segments each have their own real geometry and CRS. Inject `createAdapter` to switch providers without changing trip UI. The default is an isolated `AMapAdapter` using JS API 2.0. It rejects unsupported coordinate systems, via/policy combinations, and missing transit city metadata (`place.providerIds.amapCity`). It does not silently convert coordinates or join missing geometry with straight lines.
 
-Only the current day's overview legs or explicitly selected leg are queried. Free-time destinations are not routed. Abort handling and effect cleanup reject stale day results. Late geometry never changes a user's manually chosen viewport. Cache identity includes provider, endpoints/CRS, mode, via points, and policy. AMap caching defaults to disabled until its applicable terms are confirmed; an injected adapter may supply a terms-compliant `cacheTtlMs`. Cache storage is memory-only and cleared with the component. The development adapter uses 60 seconds to exercise reuse. No permanent provider-result storage is introduced.
+AMap's default `displayMode` is now `sequence`. The provider-neutral `dayMapScene` builds dashed stop-order segments from existing coordinates only. Missing coordinates, CRS changes and free-time areas break the line; dining layers never add stops to it. This is a schematic, explicitly labeled as such, not a road or transit result. The production AMap path makes **no driving, transit, cycling or walking planner requests**. The older isolated planner method remains dormant for a future routing task.
 
-For a future live AMap connection, the creator must provide:
+`MapScene` also carries each day's visit-specific time and description separately from physical places. The AMap adapter renders these in a safe DOM-based info window on selection, and the template supplies equivalent text outside the map. A shared hotel/station can show multiple visits without using another day's details. Every render removes the previous overlays and popup before adding the current day's markers and schematic; the same map instance survives tab changes and fullscreen.
+
+For a live AMap connection, configure the following in `.env.local` for local work and in the existing Cloudflare **build environment**, then rebuild. Vite reads these values at build time; changing only runtime Worker variables will not update a built static frontend. `.env.example` documents the names without credentials:
 
 - `VITE_AMAP_PUBLIC_KEY`: the browser-visible JS API key, restricted to intended domains.
 - `VITE_AMAP_SERVICE_HOST`: the URL of an **existing** HTTPS security proxy configured per AMap's JS API security instructions. This public URL is not a security key.
 - Server-side security credentials in that proxy, never in `VITE_*`, client code, or version control.
-- Verified GCJ02 coordinates, transit city metadata where applicable, reviewed navigation links, and any required SDK-host access.
+- Existing GCJ02 coordinates and access to AMap SDK/tile hosts. Unknown coordinates stay absent. No routing metadata or planner service is required for sequence mode.
 
 The repository currently has no security proxy. This task does not create a backend, provision credentials, or modify Cloudflare deployment settings. Without both public key and service host, visitors see a clear no-configuration state and the complete text guide. They never see a key entry form.
 
-**Live-provider limitation:** this environment denied access to the official AMap documentation and has no AMap credentials. SDK callback loading was checked against the published official `@amap/amap-jsapi-loader` package (1.0.1). Routing APIs, response normalization, proxy configuration, and actual basemap/routing/touch behavior must still be reviewed against current official documentation and tested before enabling production maps. Adapter fixture tests are not a live AMap verification. No claim is made that previous mobile/in-app-browser failures are resolved.
+**Live-provider limitation:** this environment denied access to the official AMap documentation and has no AMap credentials. SDK callback loading was checked against the published official `@amap/amap-jsapi-loader` package (1.0.1). Proxy configuration and actual basemap/marker/touch behavior must still be reviewed against current official documentation and tested before enabling production maps. Adapter fixture tests are not a live AMap verification. No claim is made that previous mobile/in-app-browser failures are resolved.
 
 Official review references:
 
@@ -76,3 +78,14 @@ python3 tests/verify_template.py
 The browser script checks 320/390/820/1440px rendering, original demo, alternate layouts, independent dining expansion, no-config fallback, fullscreen focus, map/card selection, repeated hotel stops, stale responses, routing failure/retry, cache reuse, image rights, and safe links. Test tools are external to application dependencies. Screenshot artifacts are written under `/tmp/travel-template-verification`.
 
 Actual AMap service, physical phones, in-app browsers, and the deployed Cloudflare site remain unverified. The existing `npm run build` → `dist/` Cloudflare Pages workflow is preserved.
+
+Sequence-mode checks:
+
+```sh
+node --experimental-strip-types --test tests/map-sequence.test.ts
+npm run dev -- --port 5173 --strictPort
+# Separate terminal, with Python Playwright + Chromium:
+python3 tests/verify_amap_sequence.py
+```
+
+The SDK simulation drives the actual `AMapAdapter`: marker clicks, visit times/descriptions, day changes, missing-coordinate gaps, restaurant layers, fullscreen reuse and zero planner calls. It is not a successful live AMap connection. The current managed environment had neither required map variable at implementation time; their names were saved to its configuration draft. Enter the real values through environment settings, keep the security code on the existing proxy, and rebuild before live verification. No private key is embedded or requested through the visitor UI.

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Coordinate, Day, RouteResult, Trip } from "../../types/travel";
 import type { MapAdapter, RouteRequest } from "../../maps/MapAdapter";
+import { dayMapScene } from "../../maps/sequence";
 import { routeCacheKey } from "../../maps/MapAdapter";
 import type { TripSelection } from "./useTripSelection";
 import { useModal } from "./accessibility";
@@ -76,6 +77,7 @@ export function TripMap({
     const controller = new AbortController();
     let valid = true;
     const instance = adapter.current!;
+    if (instance.displayMode === "sequence") return;
     const legs = selectedLegId
       ? day.legs.filter((l) => l.id === selectedLegId)
       : day.legs.filter((l) => l.includeInOverview);
@@ -173,6 +175,7 @@ export function TripMap({
   ]);
   const visiblePlaces = [...visibleIds].map((id) => trip.places[id]);
   const visibleKey = [...visibleIds].join("|");
+  const scene = dayMapScene(trip, day, selectedLegId);
   useEffect(() => {
     if (status === "ready")
       adapter.current?.render(
@@ -181,8 +184,9 @@ export function TripMap({
           day.legs.some((l) => l.id === r.legId),
         ),
         selectedPlaceId,
+        scene,
       );
-  }, [status, visibleKey, results, selectedPlaceId, trip]);
+  }, [status, visibleKey, results, selectedPlaceId, trip, day, selectedLegId]);
   useEffect(() => {
     if (status !== "ready" || viewportIntent.kind === "user") return;
     let ids = mainIds;
@@ -229,6 +233,9 @@ export function TripMap({
       aria-label="当天地图"
     >
       <h2>当天地图 · {day.title}</h2>
+      <p className="map-sequence-note">
+        虚线为停留顺序示意，不是道路或公交路线；缺失坐标处断开，自由逛吃不固定连线。
+      </p>
       <MapControls
         selection={selection}
         collapsed={collapsed}
@@ -280,6 +287,7 @@ export function TripMap({
         day={day}
         selection={selection}
         results={results}
+        sequenceOnly={adapter.current?.displayMode === "sequence"}
         onRetry={(id) => {
           const leg = day.legs.find((l) => l.id === id)!;
           const from =

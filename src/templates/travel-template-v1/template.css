@@ -469,3 +469,21 @@ body:has(.travel-template) {
     text-align: left;
   }
 }
+
+.map-place-popup {
+  max-width: 260px;
+  max-height: 220px;
+  overflow-y: auto;
+  color: var(--travel-text);
+  font:
+    14px/1.5 system-ui,
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+.map-place-popup p {
+  margin: 6px 0;
+}
+.map-sequence-note {
+  font-size: 14px;
+  color: var(--travel-muted);
+}

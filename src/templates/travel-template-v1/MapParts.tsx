@@ -97,6 +97,14 @@ export function PlacePreview({
       </p>
       <Address place={p} />
       <ExternalLinks links={p.links} />
+      {stops.map((s) => (
+        <div key={`summary-${s.id}`}>
+          <p>
+            计划时间：{s.startTime ?? "未定"}–{s.endTime ?? "未定"}
+          </p>
+          <p>{s.note ?? p.summary ?? "暂无地点简介。"}</p>
+        </div>
+      ))}
       {stops.map((s, i) => (
         <button key={s.id} onClick={() => onItinerary(s.id)}>
           查看行程
@@ -115,12 +123,14 @@ export function RoutePanel({
   selection,
   results,
   onRetry,
+  sequenceOnly = false,
 }: {
   trip: Trip;
   day: Day;
   selection: TripSelection;
   results: Record<string, RouteResult>;
   onRetry: (id: string) => void;
+  sequenceOnly?: boolean;
 }) {
   const legs = selection.selectedLegId
     ? day.legs.filter((l) => l.id === selection.selectedLegId)
@@ -169,15 +179,17 @@ export function RoutePanel({
               </p>
             )}
             <small>
-              {!r
-                ? "未查询：以文字说明为准"
-                : r.status === "loading"
-                  ? "路线查询中"
-                  : r.status === "error"
-                    ? `路线不可用（${r.errorKind}），不绘制猜测路径。`
-                    : r.status === "partial"
-                      ? "仅部分真实路径可用；缺段不补线。"
-                      : "已获取真实路线"}
+              {sequenceOnly
+                ? "仅显示顺序示意；不查询驾车、公交或步行导航。"
+                : !r
+                  ? "未查询：以文字说明为准"
+                  : r.status === "loading"
+                    ? "路线查询中"
+                    : r.status === "error"
+                      ? `路线不可用（${r.errorKind}），不绘制猜测路径。`
+                      : r.status === "partial"
+                        ? "仅部分真实路径可用；缺段不补线。"
+                        : "已获取真实路线"}
             </small>
             {r?.durationSeconds !== undefined && (
               <p>
