@@ -10,6 +10,16 @@ export function applyV5Presentation(trip: Trip): Trip {
     if (leg.id === "d1-l3") leg.routingFromPlaceId = "academy-entrance";
     if (leg.id === "d1-l5") leg.routingFromPlaceId = "hnu-metro";
   }
+  const nearby = [
+    { id: "academy-entrance", name: "赫曦台", lng: 112.9416, lat: 28.18028, summary: "书院入口附近，可顺路短停。" },
+    { id: "zibei", name: "自卑亭", lng: 112.944523, lat: 28.179677, summary: "东方红广场旁，可顺路看一看。" },
+    { id: "hnu-stone", name: "湖南大学石碑", lng: 112.952741, lat: 28.17883, summary: "广场以东，需要额外步行，可按体力选择。" },
+  ];
+  for (const item of nearby) {
+    const query = new URLSearchParams({ to: `${item.lng},${item.lat},${item.name}`, mode: "walk", src: "travel_web", callnative: "1" });
+    trip.places[item.id] = { id: item.id, name: item.name, kind: "other", mapRole: "nearby", summary: item.summary, coordinate: { lng: item.lng, lat: item.lat, crs: "GCJ02" }, providerIds: { amapCity: "长沙市" }, photos: [], links: [{ id: `${item.id}-nav`, platform: "高德", action: "navigation", navigationIntent: "current-location", label: "高德导航", targetType: "detail", url: `https://uri.amap.com/navigation?${query}` }] };
+  }
+  trip.days[0].nearbyPlaceIds = [...new Set([...trip.days[0].nearbyPlaceIds, ...nearby.map((p) => p.id)])];
   if (trip.places.square) trip.places.square.mapLabel = "湖大广场";
   if (trip.places["lushan-food"]) trip.places["lushan-food"].mapLabel = "麓山南路逛吃";
   const academy = trip.places.academy;

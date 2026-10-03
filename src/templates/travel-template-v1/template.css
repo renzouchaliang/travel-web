@@ -595,3 +595,9 @@ body:has(.travel-template) {
 .layout-stacked .transit-leg.mode-drive, .layout-stacked .transit-leg.mode-taxi { background:#eef5f4; border-color:#d5e4e0; border-left-color:var(--travel-primary); }
 .transit-leg .transit-heading { color:var(--travel-primary); margin:0 0 8px; }
 .travel-template .transit-leg button { min-height:32px; font-size:12px; padding:4px 8px; }
+.nearby-list { margin-top:28px; }
+.nearby-list > p { color:var(--travel-muted); font-size:14px; }
+.nearby-row { border-bottom:1px solid var(--travel-border); padding:7px 2px 12px; }
+.nearby-row summary { font-weight:600; font-size:16px; }
+.nearby-row p { font-size:14px; line-height:1.5; }
+.nearby-pin .travel-map-dot { background:#67826c; border-radius:7px; }

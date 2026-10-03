@@ -276,12 +276,12 @@ export function TripMap({
         <p>当天暂无已核查坐标，不生成假地图点。</p>
       )}
       <div className="map-legend"><span className="legend-transit">公交／地铁</span><span className="legend-walk">步行路线</span><span>● 自由逛吃地点</span></div>
-      <details className="map-equivalent">
+      <details className="map-equivalent" key={`${activeDayId}:${visibleLayers.restaurants}:${visibleLayers.nearby}`} open={visibleLayers.restaurants || visibleLayers.nearby ? true : undefined}>
         <summary>地图地点的等效文字列表</summary>
         {visiblePlaces.map((p) => (
           <button
             key={p.id}
-            onClick={() => selection.selectPlace(p.id, day, false)}
+            onClick={() => selection.selectPlace(p.id, day, true)}
           >
             {p.name}
             {!p.coordinate ? " · 暂无坐标" : ""}

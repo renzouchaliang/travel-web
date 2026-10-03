@@ -26,7 +26,7 @@ export function ExternalLinks({ links }: { links: ExternalLink[] }) {
             : l.action === "navigation" &&
                 l.navigationIntent === "current-location"
               ? `${l.platform} · 从当前位置出发`
-              : l.label}{" "}
+              : l.label.replace(/^(大众点评|携程|马蜂窝|美团)\s*[·・]\s*\1$/, "$1")}{" "}
       ↗
     </a>
   );

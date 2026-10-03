@@ -48,7 +48,7 @@ export function MapControls({
         aria-pressed={selection.visibleLayers.nearby}
         onClick={() => selection.toggleLayer("nearby")}
       >
-        周边地点
+        周边有趣地点
       </button>
       <button className="map-expand-toggle" onClick={() => selection.setMapExpanded(!selection.mapExpanded)}>
         {selection.mapExpanded ? "关闭全屏地图" : "放大地图"}
@@ -58,15 +58,7 @@ export function MapControls({
           {collapsed ? "展开地图" : "收起地图"}
         </button>
       )}
-      {!selection.mapExpanded && <button
-        className="touch-control"
-        aria-pressed={selection.mapInteractionEnabled}
-        onClick={() =>
-          selection.setMapInteractionEnabled(!selection.mapInteractionEnabled)
-        }
-      >
-        {selection.mapInteractionEnabled ? "完成" : "操作地图"}
-      </button>}
+
     </div>
   );
 }

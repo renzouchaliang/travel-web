@@ -144,10 +144,11 @@ export class AMapAdapter implements MapAdapter {
       element.type = "button";
       element.className = dining ? "travel-map-dining" : "travel-map-pin";
       element.classList.toggle("active", selected);
+      element.classList.toggle("nearby-pin", p.mapRole === "nearby");
       element.setAttribute("aria-label", p.name);
       const dot = document.createElement("span");
       dot.className = "travel-map-dot";
-      if (!dining) dot.textContent = ["station", "airport"].includes(p.kind) ? "站" : p.kind === "hotel" ? "宿" : String(places.slice(0, index + 1).filter((place) => !["station", "airport", "restaurant"].includes(place.kind)).length);
+      if (!dining) dot.textContent = p.mapRole === "nearby" ? "◇" : ["station", "airport"].includes(p.kind) ? "站" : p.kind === "hotel" ? "宿" : String(places.slice(0, index + 1).filter((place) => !["station", "airport", "restaurant"].includes(place.kind)).length);
       const label = document.createElement("span");
       label.className = "travel-map-label";
       label.textContent = p.kind === "hotel" && hotelCount > 1 && !p.mapLabel ? `酒店${places.filter((place) => place.kind === "hotel").findIndex((place) => place.id === p.id) + 1}` : mapLabel(p, hotelCount);

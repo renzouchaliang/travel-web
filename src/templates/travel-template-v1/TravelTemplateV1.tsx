@@ -7,7 +7,7 @@ import { useTripSelection } from "./useTripSelection";
 import { TripMap, type AdapterFactory } from "./TripMap";
 import { ItineraryTimeline } from "./ItineraryTimeline";
 import { RestaurantList } from "./RestaurantList";
-import { PlaceCard } from "./PlaceCard";
+import { ExternalLinks } from "./ExternalLinks";
 
 import { defaultConfig, themeVariables } from "./theme";
 import { scrollToSection } from "./accessibility";
@@ -71,30 +71,13 @@ export function DaySummary({ trip, day }: { trip: Trip; day: Day }) {
     </section>
   );
 }
-export function NearbyPlaces({
-  trip,
-  day,
-  onMap,
-}: {
-  trip: Trip;
-  day: Day;
-  onMap: (id: string) => void;
-}) {
-  return (
-    <section id="nearby">
-      <h2>可选周边</h2>
-      <p>顺路可选或需要绕行，均非当天必经节点。</p>
-      {day.nearbyPlaceIds.length === 0 && <p>暂无可选周边。</p>}
-      {day.nearbyPlaceIds.map((id) => (
-        <PlaceCard
-          key={id}
-          place={trip.places[id]}
-          trip={trip}
-          onMap={() => onMap(id)}
-        />
-      ))}
-    </section>
-  );
+export function NearbyPlaces({ trip, onMap }: { trip: Trip; onMap: (id: string) => void }) {
+  const ids = [...new Set(trip.days.flatMap((d) => d.nearbyPlaceIds))];
+  if (!ids.length) return null;
+  return <section id="nearby" className="nearby-list"><h2>周边还有什么有趣的</h2><p>未列入固定行程，按兴趣和体力选择。</p>{ids.map((id) => {
+    const place = trip.places[id];
+    return <details className="nearby-row" key={id}><summary>{place.name}</summary><p>{place.summary}</p>{place.address && <p>{place.address}</p>}<div className="card-actions"><button className="compact-map-button" onClick={() => onMap(id)}>在地图看</button><ExternalLinks links={place.links} /></div></details>;
+  })}</section>;
 }
 export function MobileQuickNav({
   trip,
@@ -226,9 +209,15 @@ export function TravelTemplateV1({
         </div>}
         {!day.stops.length && <div className="empty-day">这一天的行程待补充</div>}
         {!!day.restaurantGroups.length && <RestaurantList trip={trip} day={day} onMap={onMap} />}
-        {!!day.nearbyPlaceIds.length && <NearbyPlaces trip={trip} day={day} onMap={onMap} />}
+
 
       </div>
+      <NearbyPlaces trip={trip} onMap={(id) => {
+        const targetDay = trip.days.find((d) => d.nearbyPlaceIds.includes(id)) ?? day;
+        if (targetDay.id !== day.id) selection.switchDay(targetDay.id);
+        selection.selectPlace(id, targetDay, true);
+        requestAnimationFrame(() => scrollToSection("trip-map"));
+      }} />
       <MobileQuickNav
         trip={trip}
         day={day}

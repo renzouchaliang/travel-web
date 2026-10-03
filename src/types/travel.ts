@@ -46,6 +46,7 @@ export interface Place {
   name: string;
   branchName?: string;
   mapLabel?: string;
+  mapRole?: "nearby";
   kind: PlaceKind;
   coordinate?: Coordinate; // 不知道时留空，不生成假坐标
   providerIds?: Record<string, string>;

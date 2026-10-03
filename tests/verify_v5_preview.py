@@ -1,9 +1,9 @@
 from playwright.sync_api import sync_playwright
 MOCK='''(() => {
-window.mapChecks={queries:[],fits:[],lines:[],markers:[],zoom:12,events:{},popups:0};
+window.mapChecks={queries:[],fits:[],lines:[],markers:[],zoom:12,events:{},popups:0,interactive:false};
 class Marker {constructor(o){this.o=o;} on(){} off(){} setzIndex(){} show(){if(this.o.content)this.o.content.hidden=false;} hide(){if(this.o.content)this.o.content.hidden=true;}}
 class Polyline {constructor(o){this.o=o;}}
-class Map {constructor(el){this.el=el;} on(n,f){if(n==='complete')queueMicrotask(f);window.mapChecks.events[n]=f;} off(n){delete window.mapChecks.events[n];} getZoom(){return window.mapChecks.zoom;} getZooms(){return [3,20];} setZoom(z){window.mapChecks.zoom=z;window.mapChecks.events.zoomend?.();} remove(){window.mapChecks.lines=[];this.el.replaceChildren();} add(items){window.mapChecks.lines=items.filter(x=>x instanceof Polyline).map(x=>x.o);window.mapChecks.markers=items.filter(x=>x instanceof Marker).map(x=>x.o); for(const marker of window.mapChecks.markers)if(marker.content)this.el.append(marker.content);} setFitView(ms){window.mapChecks.fits.push(ms.map(m=>m.o.position));} setZoomAndCenter(z,p){window.mapChecks.zoom=z;window.mapChecks.fits.push([p]);window.mapChecks.events.zoomend?.();} setStatus(){} resize(){} destroy(){this.el.replaceChildren();}}
+class Map {constructor(el){this.el=el;} on(n,f){if(n==='complete')queueMicrotask(f);window.mapChecks.events[n]=f;} off(n){delete window.mapChecks.events[n];} getZoom(){return window.mapChecks.zoom;} getZooms(){return [3,20];} setZoom(z){window.mapChecks.zoom=z;window.mapChecks.events.zoomend?.();} remove(){window.mapChecks.lines=[];this.el.replaceChildren();} add(items){window.mapChecks.lines=items.filter(x=>x instanceof Polyline).map(x=>x.o);window.mapChecks.markers=items.filter(x=>x instanceof Marker).map(x=>x.o); for(const marker of window.mapChecks.markers)if(marker.content)this.el.append(marker.content);} setFitView(ms){window.mapChecks.fits.push(ms.map(m=>m.o.position));} setZoomAndCenter(z,p){window.mapChecks.zoom=z;window.mapChecks.fits.push([p]);window.mapChecks.events.zoomend?.();} setStatus(s){window.mapChecks.interactive=s.dragEnable&&s.touchZoom;} resize(){} destroy(){this.el.replaceChildren();}}
 class InfoWindow {constructor(){window.mapChecks.popups++;} setContent(){} open(){} close(){}}
 
 class Planner {constructor(o){} clear(){} search(a,b,cb){window.mapChecks.queries.push([a,b]); queueMicrotask(()=>cb('complete',{routes:[{steps:[{path:[a,b]}],time:900,distance:1000}],plans:[{segments:[{transit_mode:'SUBWAY',transit:{path:[a,b],lines:[{name:'地铁4号线'}]}}],time:1800,distance:4000}]}));}}
@@ -18,6 +18,17 @@ with sync_playwright() as p:
   page.goto('http://127.0.0.1:5173/?trip=changsha-2026-10',wait_until='domcontentloaded')
   page.wait_for_function('window.mapChecks.queries.length===2 && window.mapChecks.lines.length===2')
   assert page.locator('.day-tabs [role=tab]').count()==4
+  assert page.evaluate('window.mapChecks.interactive')
+  assert page.locator('.map-canvas').evaluate('(e)=>getComputedStyle(e).touchAction')=='none'
+  assert page.get_by_role('button',name='操作地图',exact=True).count()==0
+  page.get_by_role('button',name='周边有趣地点',exact=True).click()
+  assert page.locator('.nearby-pin').count()==3
+  assert page.locator('.map-equivalent').get_attribute('open') is not None
+  assert len(page.evaluate('window.mapChecks.lines'))==2
+  page.get_by_role('button',name='周边有趣地点',exact=True).click()
+  assert page.locator('.nearby-pin').count()==0
+  assert page.locator('.restaurant-row h4 button, .restaurant-row h4 a').count()==0
+  assert '大众点评 · 大众点评' not in page.locator('.restaurant-group').inner_text()
   assert page.locator('.place-media img').count()==2
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
   checks=page.evaluate('window.mapChecks')
@@ -49,7 +60,7 @@ with sync_playwright() as p:
   page.get_by_role('button',name='缩小一级',exact=True).click()
   assert page.evaluate('window.mapChecks.zoom')==before_zoom
   page.locator('.dining-tabs [role=tab]').nth(2).click()
-  page.locator('.restaurant-group .restaurant-title-button').first.click()
+  page.locator('.restaurant-group .compact-map-button').first.click()
   assert page.evaluate('window.mapChecks.zoom')==16
   assert page.locator('.travel-map-dining.active .travel-map-label').is_visible()
   assert page.evaluate('window.mapChecks.popups')==0
@@ -67,6 +78,14 @@ with sync_playwright() as p:
    assert page.get_by_role('dialog').count()==0
   page.locator('.day-tabs [role=tab]').nth(3).click()
   assert page.get_by_text('20:40 出发',exact=True).is_visible()
+  assert page.locator('#nearby .nearby-row').count()==3
+  page.locator('#nearby .nearby-row').nth(1).locator('summary').click()
+  page.locator('#nearby .nearby-row').nth(1).get_by_role('button',name='在地图看',exact=True).click()
+  assert page.locator('.day-tabs [role=tab]').first.get_attribute('aria-selected')=='true'
+  assert page.get_by_role('button',name='周边有趣地点').get_attribute('aria-pressed')=='true'
+  assert page.locator('.nearby-pin.active .travel-map-label').inner_text()=='自卑亭'
+  page.get_by_role('button',name='查看全天',exact=True).click()
+  assert not page.locator('.travel-map-pin.active').count()
   assert not errors,errors
   print('PASS',width,'four days, blank date, V5 media, dining, modal, real route calls, station excluded')
   page.close()

@@ -38,6 +38,7 @@ type ExportStop = RawStop & {
 };
 type ExportDay = Omit<RawExport["trip"]["days"][number], "stops"> & {
   stops: ExportStop[] | null;
+  nearbyPlaces?: Place[];
 };
 export type ChangshaExport = Omit<RawExport, "trip"> & {
   trip: Omit<RawExport["trip"], "days"> & { days: ExportDay[] };
@@ -169,6 +170,7 @@ export function adaptChangsha(input: ChangshaExport): Trip {
         : [],
     };
   }
+  for (const day of exported.days) for (const place of day.nearbyPlaces ?? []) places[place.id] = { ...place, mapRole: "nearby" };
   const hotel = places[exported.hotel.placeId];
   hotel.summary = `${exported.hotel.checkInDate} 入住 · ${exported.hotel.checkOutDate} 退房 · ${exported.hotel.nights} 晚`;
 
@@ -285,7 +287,7 @@ export function adaptChangsha(input: ChangshaExport): Trip {
       stops,
       legs,
       restaurantGroups: groups,
-      nearbyPlaceIds: [],
+      nearbyPlaceIds: (day.nearbyPlaces ?? []).map((p) => p.id),
       returnPlaceId: end?.placeId,
       alerts,
     };

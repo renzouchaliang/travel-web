@@ -15,7 +15,7 @@ export function useTripSelection(initialDayId: string) {
     nearby: false,
   });
   const [mapExpanded, setMapExpanded] = useState(false);
-  const [mapInteractionEnabled, setMapInteractionEnabled] = useState(false);
+  const [mapInteractionEnabled, setMapInteractionEnabled] = useState(true);
   const [viewportIntent, setIntent] = useState<ViewportIntent>({
     kind: "day",
     revision: 0,
