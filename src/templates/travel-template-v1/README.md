@@ -54,6 +54,8 @@ Official review references:
 
 ## Responsive and accessible behavior
 
+These are template-wide defaults for every trip rendered with `TravelTemplateV1`; no trip-specific CSS override or opt-in is required.
+
 Under 768px, the page is single-column with map height `clamp(220px, 34svh, 320px)` and a safe-area-aware fixed bottom bar. At 768–1023px it stays single-column with a 320–400px map. At 1024px and above it uses 56/44 map/timeline columns separated by 24px, up to 1320px wide, with a sticky map and whole-page timeline scrolling. Stacked/right-map variations are supported.
 
 Normal phone/tablet map gestures are disabled through the adapter until “操作地图”; “完成” returns to page scrolling. There is no transparent gesture-catching overlay. Desktop dragging is enabled, wheel zoom disabled. Fullscreen expands the same container, triggers resize observation, traps keyboard focus, locks background scrolling, supports Escape, and restores focus/scroll position. A map text list remains available. On phones below 768px, multi-day tabs stack vertically with wrapping labels and Up/Down/Home/End keyboard navigation so every day is visible without swiping sideways. Tablet and desktop tabs remain horizontal with Left/Right/Home/End navigation and automatic horizontal visibility. Independent day/group dining state does not reset other groups.
