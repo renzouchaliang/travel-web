@@ -139,7 +139,7 @@ export class AMapAdapter implements MapAdapter {
         position: gcj(p.coordinate),
         title: p.name,
         label: {
-          content: `<span class="amap-poi ${p.id === selectedPlaceId ? "active" : ""}">${p.kind === "restaurant" ? "餐饮候选" : p.kind === "hotel" ? "酒店" : index + 1} · ${escapeLabel(p.name)}</span>`,
+          content: `<span class="amap-poi ${p.id === selectedPlaceId ? "active" : ""}">${p.kind === "restaurant" ? "餐饮候选" : ["station", "airport"].includes(p.kind) ? "起／返" : places.slice(0, index + 1).filter((place) => !["station", "airport", "restaurant"].includes(place.kind)).length} · ${escapeLabel(p.name)}</span>`,
           direction: "top",
         },
       });

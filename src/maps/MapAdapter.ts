@@ -41,5 +41,6 @@ export function routeCacheKey(provider: string, request: RouteRequest) {
     request.leg.mode,
     request.via.map((p) => p.coordinate),
     request.leg.routePolicy,
+    request.leg.preferredLine,
   ]);
 }

@@ -66,7 +66,7 @@ export function PhotoGallery({ photos }: { photos: Photo[] }) {
               close();
             }}
           />
-          <p>{large.caption}</p>
+
         </div>
       )}
     </div>
