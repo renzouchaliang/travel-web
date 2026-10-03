@@ -1,8 +1,8 @@
 # travel-web
 
-A lightweight workspace for publishing interactive travel guides with React, TypeScript, Vite, and plain CSS. Different trips can use different layouts and visual identities. No map provider, fixed template, router, CMS, or UI library has been selected.
+A lightweight workspace for publishing interactive travel guides with React, TypeScript, Vite, and plain CSS. Different trips can use different layouts and visual identities. The optional `travel-template-v1` uses an isolated AMap adapter; other trips remain free to choose another layout or provider. No router, CMS, or UI library is required.
 
-The demo contains only a two-day selector to verify rendering and interaction. Maps, routes, place cards, galleries, and real travel content will be added when a guide is defined.
+The original setup demo remains at `/`. Select `/?template=travel-template-v1` for the optional, clearly labeled travel-template demo, or add `&fixture=multi-day` for the independent two-day development fixture. See [template documentation](src/templates/travel-template-v1/README.md) for component structure, trip data, themes, map prerequisites, responsive behavior, and validation. Real travel information and a live map are not configured.
 
 ## Development
 
@@ -21,7 +21,7 @@ npm run build
 npm run preview
 ```
 
-`build` runs strict TypeScript checking and produces `dist/`. `preview` serves production output on port 4173 by default, for local validation. There is no committed automated test suite yet; verify the demo buttons in a browser.
+`build` runs strict TypeScript checking and produces `dist/`. `preview` serves production output on port 4173 by default, for local validation. The optional template has a browser integration fixture and verification script; see its documentation for test prerequisites.
 
 ## Project structure
 
@@ -33,6 +33,12 @@ public/           Files copied into the build, including Cloudflare headers
 index.html        Document metadata and application root
 vite.config.ts    Frontend build configuration
 AGENTS.md         Guidance for future work
+src/templates/    Optional travel-template components and scoped themes
+src/trips/        Independent travel data and clearly labeled demo fixtures
+src/types/        Travel contracts and reference validation
+src/maps/         Provider adapters
+tests/            Development-only integration harness and browser checks
+docs/             Attached travel-template-v1 specification
 ```
 
 For real trips, introduce `src/trips/<trip>/` for trip-specific data and layouts, and `src/components/` for components genuinely shared across guides. These are suggestions, not a fixed template. Typed data or JSON can hold itinerary days, places, coordinates, routes, captions, notes, and external links. React components can compose that content in any layout. Long-form notes can initially use ordinary React markup; add Markdown tooling only if the authoring workflow requires it.

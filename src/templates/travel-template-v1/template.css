@@ -1,0 +1,456 @@
+.travel-template {
+  overflow-anchor: none;
+  color: var(--travel-text);
+  background: var(--travel-bg);
+  font-family:
+    system-ui,
+    -apple-system,
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+  line-height: 1.6;
+  font-size: 16px;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 20px 16px calc(92px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+body:has(.travel-template) {
+  background: #f3f6f4;
+}
+.travel-template * {
+  box-sizing: border-box;
+}
+.travel-template h1 {
+  font-size: clamp(22px, 3vw, 28px);
+  line-height: 1.35;
+}
+.travel-template h2 {
+  font-size: 20px;
+  margin-top: 0;
+}
+.travel-template h3 {
+  font-size: 18px;
+  line-height: 1.5;
+}
+.travel-template h4 {
+  font-size: 16px;
+}
+.travel-template p {
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.travel-template small {
+  font-size: 14px;
+  color: var(--travel-muted);
+}
+.travel-template button,
+.travel-template a,
+.travel-template select,
+.travel-template summary {
+  min-height: 44px;
+}
+.travel-template button,
+.travel-template select {
+  font: inherit;
+  border: 1px solid var(--travel-border);
+  border-radius: 9px;
+  padding: 8px 12px;
+  color: var(--travel-primary);
+  background: var(--travel-card);
+  cursor: pointer;
+  max-width: 100%;
+}
+.travel-template button[aria-pressed="true"],
+.travel-template button[aria-selected="true"] {
+  background: var(--travel-primary);
+  color: white;
+}
+.travel-template a {
+  color: var(--travel-primary);
+  display: inline-flex;
+  align-items: center;
+  padding: 8px;
+  overflow-wrap: anywhere;
+}
+.travel-template :focus-visible {
+  outline: 3px solid var(--travel-walk);
+  outline-offset: 3px;
+}
+.travel-template summary {
+  cursor: pointer;
+  padding: 8px 0;
+}
+.trip-header {
+  margin-bottom: 20px;
+}
+.main-route {
+  font-weight: 600;
+}
+.travel-card {
+  background: var(--travel-card);
+  border: 1px solid var(--travel-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.day-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.day-tabs button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.date-strip {
+  padding: 12px 16px;
+  background: var(--travel-primary);
+  color: white;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.alert {
+  border-left: 3px solid var(--travel-walk);
+  padding-left: 10px;
+}
+.map-itinerary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.map-panel,
+.itinerary {
+  min-width: 0;
+}
+.map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.map-canvas-wrap {
+  position: relative;
+  height: clamp(220px, 34svh, 320px);
+  background: #e8efeb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.map-canvas {
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+.map-canvas-wrap.interactive .map-canvas {
+  touch-action: none;
+}
+.map-canvas-wrap:not(.interactive) .map-canvas {
+  pointer-events: none;
+}
+.map-collapsed {
+  height: 0 !important;
+  visibility: hidden;
+}
+.map-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+  pointer-events: none;
+}
+.map-status button {
+  pointer-events: auto;
+}
+.map-equivalent button {
+  display: block;
+  margin: 6px 0;
+  width: 100%;
+  text-align: left;
+}
+.route-panel,
+.place-preview {
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid var(--travel-border);
+}
+.route-panel select {
+  width: 100%;
+}
+.route-panel > div {
+  padding: 8px 0;
+}
+.timeline {
+  padding-left: 14px;
+  border-left: 2px solid var(--travel-border);
+}
+.node-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--travel-primary);
+  color: white;
+  font-size: 14px;
+}
+.travel-template .selected {
+  border: 2px solid var(--travel-primary);
+}
+.transit-leg {
+  padding: 16px;
+  margin: 0 0 20px;
+  border-left: 4px solid var(--travel-transit);
+  background: #edf1f0;
+  border-radius: 12px;
+}
+.place-media {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 108px;
+  gap: 12px;
+  margin: 12px 0;
+}
+.external-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-content: start;
+}
+.place-media .external-links {
+  flex-direction: column;
+}
+.photo-gallery {
+  min-width: 0;
+}
+.photo-strip {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+.travel-template .photo-button {
+  flex: 0 0 100%;
+  padding: 0;
+  border: 0;
+  scroll-snap-align: start;
+}
+.photo-button img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+.photo-fallback {
+  font-size: 14px;
+  color: var(--travel-muted);
+  padding: 12px;
+  background: var(--travel-bg);
+  border-radius: 10px;
+}
+.photo-fallback a {
+  display: block;
+}
+.photo-modal {
+  position: fixed;
+  inset: 0;
+  background: #103e42f5;
+  z-index: 120;
+  color: white;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.photo-modal img {
+  max-width: 100%;
+  max-height: 75svh;
+  object-fit: contain;
+}
+.restaurant-row {
+  border-top: 1px solid var(--travel-border);
+  padding: 12px 0;
+  font-size: 14px;
+}
+.restaurant-row h4 {
+  margin: 8px 0;
+}
+.mobile-quick-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  gap: 6px;
+  background: var(--travel-card);
+  border-top: 1px solid var(--travel-border);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+}
+.mobile-quick-nav button {
+  flex: 1;
+  min-height: 48px;
+}
+.travel-template .map-expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  border-radius: 0;
+  margin: 0;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--travel-card);
+}
+.map-expanded .map-canvas-wrap {
+  height: 55svh;
+  min-height: 220px;
+}
+@media (max-width: 359px) {
+  .travel-template {
+    padding-inline: 12px;
+  }
+  .place-media {
+    grid-template-columns: 1fr;
+  }
+  .place-media .external-links {
+    flex-direction: row;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .map-canvas-wrap {
+    height: clamp(320px, 42svh, 400px);
+  }
+}
+@media (min-width: 1024px) {
+  .travel-template {
+    padding: 24px 24px 48px;
+  }
+  .layout-split .map-itinerary {
+    grid-template-columns: minmax(0, 56fr) minmax(0, 44fr);
+  }
+  .layout-split .map-panel:not(.map-expanded) {
+    position: sticky;
+    top: 16px;
+  }
+  .map-canvas-wrap {
+    height: clamp(220px, 42svh, 480px);
+  }
+  .layout-split.map-right .map-itinerary {
+    grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+  }
+  .layout-split.map-right .map-panel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .layout-split.map-right .itinerary {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .mobile-quick-nav,
+  .touch-control {
+    display: none;
+  }
+  .map-canvas-wrap:not(.interactive) .map-canvas {
+    pointer-events: auto;
+    touch-action: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .travel-template * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+@media print {
+  .travel-template {
+    max-width: none;
+    padding: 0;
+    color: #111;
+    background: white;
+  }
+  .map-itinerary {
+    display: block !important;
+  }
+  .map-panel {
+    position: static !important;
+  }
+  .map-canvas-wrap,
+  .map-controls,
+  .mobile-quick-nav,
+  .photo-modal,
+  .travel-template button {
+    display: none !important;
+  }
+  .travel-card,
+  .transit-leg {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+  .travel-template a {
+    color: #111;
+    text-decoration: underline;
+  }
+  .sources {
+    display: block;
+  }
+  .sources::after {
+    content: "来源链接请参阅网页版本。";
+  }
+}
+
+.place-media:has(.external-links:empty) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dining-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 12px;
+}
+.dining-filters label {
+  min-width: 0;
+  max-width: 100%;
+}
+.travel-template input {
+  font: inherit;
+  min-height: 44px;
+  max-width: 100%;
+  width: 10rem;
+  border: 1px solid var(--travel-border);
+  border-radius: 9px;
+  padding: 8px;
+}
+
+@media (min-width: 768px) {
+  .mobile-quick-nav {
+    display: none;
+  }
+  .travel-template {
+    padding-bottom: 32px;
+  }
+}
+
+.amap-poi {
+  padding: 4px 8px;
+  color: var(--travel-primary);
+  background: var(--travel-card);
+  border: 1px solid var(--travel-border);
+  border-radius: 6px;
+}
+.amap-poi.active {
+  color: white;
+  background: var(--travel-primary);
+  border: 2px solid var(--travel-primary);
+}
+
+.transit-leg.mode-walk,
+.transit-leg.mode-cycle {
+  border-left-color: var(--travel-walk);
+}
