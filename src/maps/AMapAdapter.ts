@@ -70,7 +70,7 @@ const gcj = (c?: Coordinate) => {
 };
 export class AMapAdapter implements MapAdapter {
   readonly provider = "amap";
-  readonly displayMode = "sequence" as const;
+  readonly displayMode = "planned" as const;
   private popup?: SDK;
   get cacheTtlMs() {
     return this.config.cacheTtlMs ?? 0;
@@ -123,7 +123,7 @@ export class AMapAdapter implements MapAdapter {
   }
   render(
     places: Place[],
-    _results: RouteResult[],
+    results: RouteResult[],
     selectedPlaceId?: string,
     scene?: MapScene,
   ) {
@@ -149,17 +149,16 @@ export class AMapAdapter implements MapAdapter {
       this.overlayCleanup.push(() => marker.off("click", select));
       this.overlays.push(marker);
     });
-    for (const segment of scene?.sequence ?? []) {
-      if (segment.crs !== "GCJ02" || segment.path.length < 2) continue;
-      this.overlays.push(
-        new this.sdk.Polyline({
+    for (const result of results) {
+      for (const segment of result.segments) {
+        if (segment.crs !== "GCJ02" || segment.path.length < 2) continue;
+        this.overlays.push(new this.sdk.Polyline({
           path: segment.path.map(gcj),
-          strokeColor: this.routeColors.walk,
-          strokeWeight: 4,
-          strokeStyle: "dashed",
-          strokeDasharray: [8, 6],
-        }),
-      );
+          strokeColor: segment.mode === "walk" ? this.routeColors.walk : this.routeColors.transit,
+          strokeWeight: 5, strokeStyle: segment.mode === "walk" ? "dashed" : "solid",
+          strokeDasharray: [8, 6], isOutline: true, outlineColor: "#fff", borderWeight: 2,
+        }));
+      }
     }
     this.map.add(this.overlays);
     const selected = places.find(
@@ -281,7 +280,13 @@ export class AMapAdapter implements MapAdapter {
           this.planners.add(planner!);
           const callback = (status: string, data: SDK) => {
             if (status !== "complete") return finish(result);
-            const route = data.routes?.[0] ?? data.plans?.[0];
+            const plans = data.plans ?? [];
+            const matches = (plan: SDK) => {
+              const transit = (plan.segments ?? []).filter((s: SDK) => s.transit_mode !== "WALK");
+              return transit.length > 0 && transit.every((s: SDK) => s.transit_mode === "SUBWAY" && (s.transit?.lines ?? []).some((line: SDK) => String(line.name).includes(leg.preferredLine!)));
+            };
+            const preferred = leg.preferredLine ? plans.find(matches) : undefined;
+            const route = data.routes?.[0] ?? preferred ?? plans[0];
             if (!route) return finish(result);
             const segments: RouteSegment[] = [];
             let missing = false;
@@ -291,8 +296,8 @@ export class AMapAdapter implements MapAdapter {
                 return;
               }
               const normalized = path.map((p) => ({
-                lng: Number(p.lng ?? p.getLng?.()),
-                lat: Number(p.lat ?? p.getLat?.()),
+                lng: Number(Array.isArray(p) ? p[0] : p.lng ?? p.getLng?.()),
+                lat: Number(Array.isArray(p) ? p[1] : p.lat ?? p.getLat?.()),
                 crs: "GCJ02" as const,
               }));
               if (
@@ -305,19 +310,18 @@ export class AMapAdapter implements MapAdapter {
               }
               segments.push({ mode, crs: "GCJ02", path: normalized });
             };
-            if (plugin === "Transfer")
+            if (plugin === "Transfer") {
               route.segments?.forEach((s: SDK) => {
-                s.walking?.steps?.forEach((step: SDK) =>
-                  add(step.path, "walk"),
-                );
-                if (s.transit) add(s.transit.path, "transit");
-                if (s.railway) add(s.railway.path, "transit");
-                if (!s.walking && !s.transit && !s.railway) missing = true;
+                if (s.transit_mode === "WALK") {
+                  if (s.transit?.path?.length > 1) add(s.transit.path, "walk");
+                  else if (s.transit?.steps?.length) s.transit.steps.forEach((step: SDK) => add(step.path, "walk"));
+                  else missing = true;
+                } else if (s.transit) add(s.transit.path, "transit");
+                else if (s.walking) s.walking.steps?.forEach((step: SDK) => add(step.path, "walk"));
+                else if (s.railway) add(s.railway.path, "transit");
+                else missing = true;
               });
-            else
-              (route.steps ?? route.rides)?.forEach((step: SDK) =>
-                add(step.path, leg.mode),
-              );
+            } else (route.steps ?? route.rides)?.forEach((step: SDK) => add(step.path, leg.mode));
             finish({
               ...result,
               status: segments.length
@@ -329,6 +333,8 @@ export class AMapAdapter implements MapAdapter {
               distanceMeters: route.distance,
               durationSeconds: route.time,
               fetchedAt: new Date().toISOString(),
+              routeLabel: plugin === "Transfer" ? [...new Set((route.segments ?? []).flatMap((s: SDK) => (s.transit?.lines ?? []).map((line: SDK) => line.name)))].join(" / ") : "高德步行路线",
+              planMismatch: !!leg.preferredLine && !preferred,
               errorKind: missing ? "missing-geometry" : undefined,
             });
           };

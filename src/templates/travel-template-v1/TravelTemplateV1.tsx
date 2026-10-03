@@ -8,7 +8,7 @@ import { TripMap, type AdapterFactory } from "./TripMap";
 import { ItineraryTimeline } from "./ItineraryTimeline";
 import { RestaurantList } from "./RestaurantList";
 import { PlaceCard } from "./PlaceCard";
-import { safeUrl } from "./ExternalLinks";
+
 import { defaultConfig, themeVariables } from "./theme";
 import { scrollToSection } from "./accessibility";
 import "./template.css";
@@ -40,7 +40,7 @@ export function TripHeader({ trip, day }: { trip: Trip; day: Day }) {
     <header className="trip-header">
       <h1>{trip.title}</h1>
       <p>
-        {trip.days.length} 天 · {trip.timezone}
+        {trip.days.length} 天
         {day.date && ` · ${day.date}`}
       </p>
       <p className="main-route">
@@ -55,7 +55,7 @@ export function TripHeader({ trip, day }: { trip: Trip; day: Day }) {
 export function DaySummary({ trip, day }: { trip: Trip; day: Day }) {
   return (
     <section className="travel-card day-summary">
-      <h2>当天快速概览</h2>
+      <h2>{day.title}</h2>
       <p>
         {day.stops
           .filter((s) => s.role !== "optional")
@@ -205,7 +205,7 @@ export function TravelTemplateV1({
         aria-labelledby={trip.days.length > 1 ? `tab-${day.id}` : undefined}
       >
         <DaySummary trip={trip} day={day} />
-        <div className="map-itinerary">
+        {!!day.stops.length && <div className="map-itinerary">
           <TripMap
             trip={trip}
             day={day}
@@ -223,48 +223,11 @@ export function TravelTemplateV1({
             onMap={onMap}
             onLeg={onLeg}
           />
-        </div>
-        <RestaurantList trip={trip} day={day} onMap={onMap} />
-        <NearbyPlaces trip={trip} day={day} onMap={onMap} />
-        <details className="travel-card sources">
-          <summary>来源与更新信息</summary>
-          {trip.sources.length === 0 ? (
-            <p>演示数据尚未核查，无真实评分、时长或图片授权声明。</p>
-          ) : (
-            trip.sources.map((s) => (
-              <p key={s.id}>
-                {safeUrl(s.url) ? (
-                  <a
-                    href={safeUrl(s.url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {s.title} ↗
-                  </a>
-                ) : (
-                  s.title
-                )}{" "}
-                · {s.checkedAt ?? "未核查"}
-              </p>
-            ))
-          )}
-          {Object.values(trip.places).flatMap((p) =>
-            p.photos.map((photo) => (
-              <p key={`${p.id}:${photo.id}`}>
-                {p.name}：{photo.author ?? "作者未知"} · 权利：{photo.rights}{" "}
-                {safeUrl(photo.sourceUrl) && (
-                  <a
-                    href={safeUrl(photo.sourceUrl)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    图片来源 ↗
-                  </a>
-                )}
-              </p>
-            )),
-          )}
-        </details>
+        </div>}
+        {!day.stops.length && <div className="empty-day">这一天的行程待补充</div>}
+        {!!day.restaurantGroups.length && <RestaurantList trip={trip} day={day} onMap={onMap} />}
+        {!!day.nearbyPlaceIds.length && <NearbyPlaces trip={trip} day={day} onMap={onMap} />}
+
       </div>
       <MobileQuickNav
         trip={trip}

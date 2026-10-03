@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Day, RouteLeg, Trip } from "../../types/travel";
 import type { TripSelection } from "./useTripSelection";
 import { PlaceCard } from "./PlaceCard";
@@ -28,13 +29,7 @@ export function TransitLegCard({
       id={`leg-${leg.id}`}
       className={`transit-leg mode-${leg.mode} ${selected ? "selected" : ""}`}
     >
-      <h3>
-        {name(leg.fromStopId)} → {name(leg.toStopId)}
-      </h3>
-      <p>
-        {modeLabel[leg.mode]} ·{" "}
-        {leg.includeInOverview ? "主路线" : "独立可选路段"}
-      </p>
+      <p className="transit-heading">{leg.preferredLine && <span className="line-badge" style={{ background: leg.lineColor } as CSSProperties}>{leg.preferredLine}</span>} {name(leg.fromStopId)} → {name(leg.toStopId)}</p>
       <p>{leg.summary}</p>
       {[
         leg.directionHint,
@@ -52,7 +47,7 @@ export function TransitLegCard({
           {leg.plannedMinutes.source === "estimate" ? "估算" : "已核实"}）
         </p>
       )}
-      <button onClick={onSelect}>查看这一段</button>
+      {leg.mapDisplay !== "text-only" && <button onClick={onSelect}>查看这一段</button>}
     </article>
   );
 }
@@ -71,14 +66,15 @@ export function ItineraryTimeline({
 }) {
   return (
     <section id="itinerary" className="itinerary">
-      <h2>当天行程</h2>
+      <h2>按这个顺序出发</h2>
+      {!day.stops.length && <div className="empty-day"><p>这一天的行程待补充</p></div>}
       <div className="timeline">
         {day.stops.map((stop, i) => (
           <div key={stop.id}>
             <PlaceCard
               place={trip.places[stop.placeId]}
               stop={stop}
-              number={i + 1}
+              number={["station", "airport"].includes(trip.places[stop.placeId].kind) || stop.role === "optional" ? undefined : day.stops.slice(0, i + 1).filter((s) => !["station", "airport"].includes(trip.places[s.placeId].kind) && s.role !== "optional").length}
               selected={selection.selectedStopId === stop.id}
               onMap={() => onMap(stop.placeId, stop.id)}
               trip={trip}

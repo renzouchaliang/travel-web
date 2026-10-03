@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Place, Stop, Trip } from "../../types/travel";
-import { ExternalLinks, safeUrl } from "./ExternalLinks";
+import { ExternalLinks } from "./ExternalLinks";
 import { PhotoGallery } from "./PhotoGallery";
 export function Address({ place }: { place: Place }) {
   const [status, setStatus] = useState("");
@@ -45,7 +45,6 @@ export function PlaceCard({
   number,
   selected,
   onMap,
-  trip,
 }: {
   place: Place;
   stop?: Stop;
@@ -60,31 +59,12 @@ export function PlaceCard({
       id={stop ? `stop-${stop.id}` : undefined}
       className={`travel-card place-card ${selected ? "selected" : ""}`}
     >
-      <h3>
-        {number && <span className="node-number">{number}</span>} {place.name}
-        {place.branchName && ` · ${place.branchName}`}
-      </h3>
-      {stop?.role && (
-        <small>
-          {stop.role === "main"
-            ? "主行程"
-            : stop.role === "free-time"
-              ? "自由活动 · 不固定线路"
-              : "顺路可选 / 返程"}
-        </small>
-      )}
-      {(stop?.startTime || stop?.endTime) && (
-        <p>
-          计划：{stop.startTime ?? "未定"}–{stop.endTime ?? "未定"}
-        </p>
-      )}
-      <p>{place.summary}</p>
+      {stop && <div className="stop-time"><strong>{stop.startTime ? `${stop.startTime}${stop.endTime ? `—${stop.endTime}` : ""}` : stop.timeLabel ?? (stop.role === "free-time" ? "时间自由" : "")}</strong>{stay && <span>建议游览 {stay.min}–{stay.max} 分钟</span>}</div>}
+      <h3>{number && <span className="node-number">{number}</span>} {place.name}{place.branchName && ` · ${place.branchName}`}</h3>
+      {place.kind === "attraction" && <div className="place-media"><PhotoGallery photos={place.photos} /><aside><strong>看看怎么逛</strong><ExternalLinks links={place.links.filter((l) => l.platform !== "高德")} /><small>景点介绍、照片与游客点评</small></aside></div>}
+      <p>{stop?.description ?? place.summary}</p>
       {stop?.note && <p>{stop.note}</p>}
-      {stay && (
-        <p>
-          建议停留 {stay.min}–{stay.max} 分钟
-        </p>
-      )}
+      {place.openingMilestones && <div className="opening-milestones">{place.openingMilestones.map((item) => <div key={item.label}><strong>{item.time}</strong><span>{item.label}</span></div>)}</div>}
       {place.kind === "hotel" ? (
         <HotelCard place={place} />
       ) : ["station", "airport"].includes(place.kind) ? (
@@ -102,37 +82,13 @@ export function PlaceCard({
           fact && (
             <details key={String(label)}>
               <summary>
-                {String(label)}：{fact.text}（
-                {fact.status === "verified" ? "已核查" : "待核查"}）
+                {String(label)}：{fact.text}
               </summary>
-              <p>核查：{fact.checkedAt ?? "暂无"}</p>
-              {fact.sourceIds.map((id) => {
-                const source = trip.sources.find((s) => s.id === id);
-                return source ? (
-                  <p key={id}>
-                    {safeUrl(source.url) ? (
-                      <a
-                        href={safeUrl(source.url)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {source.title} ↗
-                      </a>
-                    ) : (
-                      source.title
-                    )}
-                  </p>
-                ) : null;
-              })}
+
             </details>
           ),
       )}
-      <div
-        className={place.kind === "attraction" ? "place-media" : "place-links"}
-      >
-        {place.kind === "attraction" && <PhotoGallery photos={place.photos} />}
-        <ExternalLinks links={place.links} />
-      </div>
+      <ExternalLinks links={place.kind === "attraction" ? place.links.filter((l) => l.action === "navigation") : place.links} />
       <button onClick={onMap}>在地图看</button>
     </article>
   );

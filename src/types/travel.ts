@@ -33,6 +33,7 @@ export interface Photo {
   author?: string;
   rights: "owned" | "licensed" | "permission" | "unknown";
   licenseUrl?: string;
+  displayAsReference?: boolean; // Explicitly supplied for this design preview; no rights claim.
 }
 export interface PracticalFact {
   text: string;
@@ -52,6 +53,7 @@ export interface Place {
   summary?: string;
   suggestedStayMinutes?: { min: number; max: number };
   opening?: PracticalFact;
+  openingMilestones?: { time: string; label: string }[];
   ticket?: PracticalFact;
   booking?: PracticalFact;
   photos: Photo[];
@@ -74,6 +76,9 @@ export interface Stop {
   stayMinutes?: { min: number; max: number };
   role: "main" | "optional" | "free-time";
   note?: string;
+  description?: string;
+  timeLabel?: string;
+  mapOverview?: boolean;
 }
 export interface RouteLeg {
   id: ID;
@@ -93,6 +98,11 @@ export interface RouteLeg {
     source: "estimate" | "verified";
   };
   includeInOverview: boolean; // 返程等可默认不加入全天展示
+  mapDisplay?: "route" | "text-only";
+  preferredLine?: string;
+  routingFromPlaceId?: ID;
+  routingToPlaceId?: ID;
+  lineColor?: string;
   sourceIds: ID[];
 }
 export interface Distance {
@@ -152,5 +162,7 @@ export interface RouteResult {
   durationSeconds?: number;
   provider: string;
   fetchedAt?: string;
+  routeLabel?: string;
+  planMismatch?: boolean;
   errorKind?: string;
 }

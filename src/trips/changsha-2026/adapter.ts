@@ -1,3 +1,4 @@
+import { applyV5Presentation } from "./v5-presentation";
 import source from "./trip-changsha-2026.json" with { type: "json" };
 import type {
   Coordinate,
@@ -151,21 +152,19 @@ export function adaptChangsha(input: ChangshaExport): Trip {
               id: `${stop.placeId}-image-reference`,
               src: image.url,
               alt: image.credit,
-              caption: image.placeholder,
+              caption: image.credit,
               sourceUrl: image.sourceUrl,
               author: image.credit,
               rights: "unknown",
+              displayAsReference: true,
             },
           ]
         : [],
     };
   }
   const hotel = places[exported.hotel.placeId];
-  hotel.summary = join([
-    `${exported.hotel.checkInDate} 入住，${exported.hotel.checkOutDate} 退房，共 ${exported.hotel.nights} 晚`,
-    exported.hotel.notes,
-    "入住及退房具体时刻未确认",
-  ]);
+  hotel.summary = `${exported.hotel.checkInDate} 入住 · ${exported.hotel.checkOutDate} 退房 · ${exported.hotel.nights} 晚`;
+
 
   const originIds = new Map<string, string>();
   function restaurant(group: DiningGroup, item: Restaurant) {
@@ -215,15 +214,6 @@ export function adaptChangsha(input: ChangshaExport): Trip {
       const isReturn = stop.id === "d1-return";
       const role: Stop["role"] =
         stop.id === "d1-food" ? "free-time" : isReturn ? "optional" : "main";
-      const sourceTitles = stop.sourceIds
-        .map((id) => input.sources.find((s) => s.id === id)?.title)
-        .filter(Boolean)
-        .join("、");
-      const returnInfo =
-        day.date === exported.returnTransport.date &&
-        stop.placeId === exported.returnTransport.departurePlaceId
-          ? `已确认高铁发车时间：${exported.returnTransport.departureTime}；到站时间、车次和目的地未确认`
-          : undefined;
       return {
         id: stop.id,
         placeId: stop.placeId,
@@ -235,16 +225,10 @@ export function adaptChangsha(input: ChangshaExport): Trip {
             ? { min: stop.durationMinutes, max: stop.durationMinutes }
             : undefined),
         role,
-        note: join([
-          `行程状态：${statusText[stop.status] ?? stop.status}`,
-          stop.description,
-          stop.timeWindow && `时段：${stop.timeWindow}`,
-          `时间依据：${stop.timeBasis}`,
-          ...stop.notes,
-          stop.coordinateReference?.precisionNote,
-          returnInfo,
-          sourceTitles && `来源：${sourceTitles}`,
-        ]),
+        mapOverview: stop.type !== "transport",
+        description: isReturn ? "游览结束后返回酒店休息。" : stop.description ?? undefined,
+        timeLabel: stop.arrivalTime ? undefined : stop.timeWindow ?? undefined,
+        note: stop.notes.filter((note) => !/未确认|未提供|未核|待核|来源|坐标|授权/.test(note)).join("；") || undefined,
       };
     });
     const legs: RouteLeg[] = exported.routeLegs
@@ -258,11 +242,14 @@ export function adaptChangsha(input: ChangshaExport): Trip {
           toStopId: leg.toStopId,
           mode: leg.mode === "metro" ? "transit" : "walk",
           summary: leg.description,
+          mapDisplay: allStops.some((s) => (s.id === leg.fromStopId || s.id === leg.toStopId) && s.type === "transport") || leg.id === "d1-l4" ? "text-only" : "route",
+          preferredLine: leg.mode === "metro" ? "4号线" : undefined,
+          lineColor: leg.mode === "metro" ? "#775497" : undefined,
           plannedMinutes: leg.durationRangeMinutes
             ? { ...leg.durationRangeMinutes, source: "estimate" }
             : undefined,
           // Free dining and the standalone return stay out of the all-day route overlay.
-          includeInOverview: leg.id !== "d1-l4" && leg.id !== "d1-l5",
+          includeInOverview: leg.id !== "d1-l1" && leg.id !== "d1-l4" && leg.id !== "d1-l5",
           sourceIds: [...leg.sourceIds],
         };
       });
@@ -271,36 +258,15 @@ export function adaptChangsha(input: ChangshaExport): Trip {
       title: group.area,
       anchorPlaceId: group.anchorPlaceId,
       initialVisible: group.initialVisible,
-      description: join([
-        "候选清单不代表已确定用餐；评分与营业状态未确认。",
-        ...group.restaurants.flatMap((item) =>
-          item.notes
-            .filter((note) => !note.startsWith("候选清单"))
-            .map((note) => `${item.name}：${note}`),
-        ),
-      ]),
+      description: group.area.includes("酒店") ? "先放行李，午饭在附近选一家。" : "按位置与体力选择，不必全部打卡。",
       candidates: group.restaurants.map((item) => restaurant(group, item)),
     }));
     const end = (day.stops ?? []).find((stop) => stop.id === day.endLocationId);
-    const alerts = [
-      `旅行日期：${exported.startDate} 至 ${exported.endDate}；酒店 ${exported.hotel.nights} 晚。`,
-      `当天安排：${statusText[day.status] ?? day.status}`,
-      ...day.notes,
-    ];
-    if (day.day === 1)
-      alerts.push(...input.validation.timeConflicts.slice(0, 4));
-    if (day.stops === null) alerts.push("当天行程尚未确认，按原始资料留空。");
-    if (day.dining === null) alerts.push("当天餐饮尚未确认。");
-    if (day.day !== 1 && day.stops)
-      alerts.push("当天交通衔接、精确时间尚未确认；不补充路线或用时。");
-    if (day.date === exported.returnTransport.date)
-      alerts.push(
-        `已确认 ${exported.returnTransport.departureTime} 高铁发车；到站时间、车次和目的地未确认。`,
-      );
+    const alerts = day.day === 1 ? ["岳麓书院需预约，请按预约时段入院。"] : [];
     return {
       id: `${exported.id}-day-${day.day}`,
       date: day.date,
-      title: day.title ?? "行程尚未确认",
+      title: day.title ?? "行程待补充",
       directionSummary: day.summary ?? "",
       stops,
       legs,
@@ -329,4 +295,4 @@ export function adaptChangsha(input: ChangshaExport): Trip {
     })),
   };
 }
-export const changshaTrip = adaptChangsha(source);
+export const changshaTrip = applyV5Presentation(adaptChangsha(source));

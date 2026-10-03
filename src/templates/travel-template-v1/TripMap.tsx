@@ -82,9 +82,10 @@ export function TripMap({
       ? day.legs.filter((l) => l.id === selectedLegId)
       : day.legs.filter((l) => l.includeInOverview);
     for (const leg of legs) {
+      if (leg.mapDisplay === "text-only") continue;
       const from =
-          trip.places[day.stops.find((s) => s.id === leg.fromStopId)!.placeId],
-        to = trip.places[day.stops.find((s) => s.id === leg.toStopId)!.placeId];
+          trip.places[leg.routingFromPlaceId ?? day.stops.find((s) => s.id === leg.fromStopId)!.placeId],
+        to = trip.places[leg.routingToPlaceId ?? day.stops.find((s) => s.id === leg.toStopId)!.placeId];
       if (day.stops.find((s) => s.id === leg.toStopId)?.role === "free-time")
         continue;
       if (!from.coordinate || !to.coordinate) {
@@ -163,8 +164,8 @@ export function TripMap({
       ? day.legs
           .filter((l) => l.id === selectedLegId)
           .flatMap((l) => [
-            day.stops.find((s) => s.id === l.fromStopId)!.placeId,
-            day.stops.find((s) => s.id === l.toStopId)!.placeId,
+            l.routingFromPlaceId ?? day.stops.find((s) => s.id === l.fromStopId)!.placeId,
+            l.routingToPlaceId ?? day.stops.find((s) => s.id === l.toStopId)!.placeId,
           ])
       : []),
     ...(visibleLayers.restaurants
@@ -189,15 +190,15 @@ export function TripMap({
   }, [status, visibleKey, results, selectedPlaceId, trip, day, selectedLegId]);
   useEffect(() => {
     if (status !== "ready" || viewportIntent.kind === "user") return;
-    let ids = mainIds;
+    let ids = day.stops.filter((s) => s.mapOverview !== false && s.role !== "optional").map((s) => s.placeId);
     if (viewportIntent.kind === "place" && viewportIntent.id)
       ids = [viewportIntent.id];
     if (viewportIntent.kind === "leg") {
       const l = day.legs.find((l) => l.id === viewportIntent.id);
-      if (l)
+      if (l && l.mapDisplay !== "text-only")
         ids = [
-          day.stops.find((s) => s.id === l.fromStopId)!.placeId,
-          day.stops.find((s) => s.id === l.toStopId)!.placeId,
+          l.routingFromPlaceId ?? day.stops.find((s) => s.id === l.fromStopId)!.placeId,
+          l.routingToPlaceId ?? day.stops.find((s) => s.id === l.toStopId)!.placeId,
           ...(l.viaPlaceIds ?? []),
         ];
     }
@@ -232,15 +233,19 @@ export function TripMap({
       aria-modal={mapExpanded ? true : undefined}
       aria-label="当天地图"
     >
-      <h2>当天地图 · {day.title}</h2>
+      <h2>今天去哪里</h2>
       <p className="map-sequence-note">
-        虚线为停留顺序示意，不是道路或公交路线；缺失坐标处断开，自由逛吃不固定连线。
+        点路段查看交通路线，点“全天”恢复。自由逛吃只标地点。
       </p>
       <MapControls
         selection={selection}
         collapsed={collapsed}
         onCollapse={() => setCollapsed((v) => !v)}
       />
+      <div className="route-chips" aria-label="地图路段选择">
+        <button aria-pressed={!selectedLegId} onClick={selection.overview}>全天</button>
+        {day.legs.filter((l) => l.mapDisplay !== "text-only").map((l) => <button key={l.id} aria-pressed={selectedLegId === l.id} onClick={() => selection.selectLeg(l.id)}>{trip.places[day.stops.find((s) => s.id === l.fromStopId)!.placeId].name} → {trip.places[day.stops.find((s) => s.id === l.toStopId)!.placeId].name}</button>)}
+      </div>
       <div
         className={`map-canvas-wrap ${collapsed && !mapExpanded ? "map-collapsed" : ""} ${mapInteractionEnabled || mapExpanded ? "interactive" : ""}`}
       >
@@ -264,6 +269,7 @@ export function TripMap({
       {!visiblePlaces.some((p) => p.coordinate) && (
         <p>当天暂无已核查坐标，不生成假地图点。</p>
       )}
+      <div className="map-legend"><span className="legend-transit">公交／地铁</span><span className="legend-walk">步行路线</span><span>● 自由逛吃地点</span></div>
       <details className="map-equivalent">
         <summary>地图地点的等效文字列表</summary>
         {visiblePlaces.map((p) => (

@@ -18,7 +18,7 @@ const trip =
 const config = {
   ...defaultConfig,
   desktopLayout:
-    params.get("layout") === "stacked"
+    params.get("layout") === "stacked" || (publishedTrip && params.get("layout") !== "split")
       ? ("stacked" as const)
       : ("split" as const),
   mapSide:

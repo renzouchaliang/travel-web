@@ -1,3 +1,7 @@
+# V5 多天样式审阅版
+
+当前行为以 [审阅记录](../../../docs/v5-preview-review.md) 为准。2026-10-04 已根据用户提供的 V5 HTML 恢复高德路线规划，并更新图文时间线。以下是旧版实现记录，其中顺序示意与未收到 V5 的说明已被本次更新替代。
+
 # travel-template-v1
 
 An optional implementation of the attached v1 specification. It does not impose a layout on other trips or replace the original setup demo. No UI, routing, or state-management dependency was added.

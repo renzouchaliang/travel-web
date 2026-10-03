@@ -11,30 +11,11 @@ export function PhotoGallery({ photos }: { photos: Photo[] }) {
   useModal(!!large, modal, close);
   const authorized = photos.filter(
     (p) =>
-      p.rights !== "unknown" &&
+      (p.rights !== "unknown" || p.displayAsReference) &&
       !failed.includes(p.id) &&
       (safeUrl(p.src) || p.src.startsWith("/")),
   );
-  if (!authorized.length)
-    return (
-      <div className="photo-fallback">
-        {failed.length
-          ? "图片加载失败，文字与攻略仍可使用。"
-          : "暂无授权图片。"}
-        {photos
-          .filter((p) => safeUrl(p.sourceUrl))
-          .map((p) => (
-            <a
-              key={p.id}
-              href={safeUrl(p.sourceUrl)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              图片来源（不代表授权） ↗
-            </a>
-          ))}
-      </div>
-    );
+  if (!authorized.length) return failed.length ? <div className="photo-fallback">景点照片暂未加载</div> : null;
   return (
     <div className="photo-gallery">
       <div
@@ -58,6 +39,7 @@ export function PhotoGallery({ photos }: { photos: Photo[] }) {
               src={p.src}
               alt={p.alt}
               loading="lazy"
+              referrerPolicy="no-referrer"
               onError={() => setFailed((v) => [...v, p.id])}
             />
           </button>
@@ -67,9 +49,6 @@ export function PhotoGallery({ photos }: { photos: Photo[] }) {
         {Math.min(index + 1, authorized.length)}/{authorized.length}
       </span>
       {authorized[index]?.caption && <p>{authorized[index].caption}</p>}
-      {authorized[index]?.author && (
-        <small>作者：{authorized[index].author}</small>
-      )}
       {large && (
         <div
           className="photo-modal"

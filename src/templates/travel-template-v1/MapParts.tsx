@@ -14,8 +14,8 @@ export function MapStatus({
     loading: "地图加载中…",
     ready: "地图已加载；路线状态单独显示。",
     unconfigured: "地图未配置：完整文字行程仍可使用。",
-    "sdk-error": "地图 SDK 加载失败。",
-    "basemap-timeout": "底图加载超时。",
+    "sdk-error": "地图暂未加载，可先按下方交通说明出行。",
+    "basemap-timeout": "地图加载较慢，请稍后重试。",
   };
   return (
     <div className="map-status" role="status">
@@ -134,7 +134,7 @@ export function RoutePanel({
 }) {
   const legs = selection.selectedLegId
     ? day.legs.filter((l) => l.id === selection.selectedLegId)
-    : day.legs.filter((l) => l.includeInOverview);
+    : day.legs.filter((l) => l.includeInOverview && l.mapDisplay !== "text-only");
   return (
     <div className="route-panel">
       <h3>{selection.selectedLegId ? "当前路段" : "全天主路线"}</h3>
@@ -149,7 +149,7 @@ export function RoutePanel({
           }
         >
           <option value="">查看全天</option>
-          {day.legs.map((l) => (
+          {day.legs.filter((l) => l.mapDisplay !== "text-only").map((l) => (
             <option key={l.id} value={l.id}>
               {
                 trip.places[
@@ -174,23 +174,25 @@ export function RoutePanel({
             </p>
             {l.plannedMinutes && (
               <p>
-                编辑计划：{l.plannedMinutes.min}–{l.plannedMinutes.max} 分钟（
-                {l.plannedMinutes.source}）
+                计划用时：{l.plannedMinutes.min}–{l.plannedMinutes.max} 分钟（
+                {l.plannedMinutes.source === "estimate" ? "预留" : "计划"}）
               </p>
             )}
             <small>
-              {sequenceOnly
+              {l.mapDisplay === "text-only" ? "仅提供交通说明，不绘制接驳路线。" : sequenceOnly
                 ? "仅显示顺序示意；不查询驾车、公交或步行导航。"
                 : !r
                   ? "未查询：以文字说明为准"
                   : r.status === "loading"
                     ? "路线查询中"
                     : r.status === "error"
-                      ? `路线不可用（${r.errorKind}），不绘制猜测路径。`
+                      ? "路线暂未加载，请按交通说明出行或打开高德导航。"
                       : r.status === "partial"
                         ? "仅部分真实路径可用；缺段不补线。"
                         : "已获取真实路线"}
             </small>
+            {r?.routeLabel && <p>{r.routeLabel}</p>}
+            {r?.planMismatch && <p className="alert">未返回已选地铁线路，当前显示高德备选方案，请核对后使用。</p>}
             {r?.durationSeconds !== undefined && (
               <p>
                 动态查询约 {Math.ceil(r.durationSeconds / 60)}{" "}

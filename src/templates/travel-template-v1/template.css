@@ -487,3 +487,50 @@ body:has(.travel-template) {
   font-size: 14px;
   color: var(--travel-muted);
 }
+/* V5 review layout: a readable guide, with transport between destination cards. */
+.travel-template.layout-stacked { max-width: 960px; padding-top: 0; }
+.layout-stacked .trip-header { background: var(--travel-primary); color: #fff; margin: 0 -16px 20px; padding: 28px 24px; }
+.trip-header p { opacity: .85; }
+.layout-stacked .day-summary { background: transparent; border: 0; padding: 4px 0 12px; }
+.layout-stacked .day-summary > p:first-of-type { display: none; }
+.layout-stacked .map-itinerary { display: block; }
+.layout-stacked .map-panel { padding: 0; overflow: hidden; }
+.layout-stacked .map-panel > h2, .layout-stacked .map-sequence-note, .layout-stacked .map-controls { margin: 16px 20px; }
+.route-chips { display:flex; gap:8px; overflow-x:auto; padding:12px 18px; background:#f8faf8; }
+.route-chips button { flex-shrink:0; border-radius:30px; font-size:14px; max-width:240px; }
+.map-legend { display:flex; flex-wrap:wrap; gap:18px; padding:14px 18px; color:#506b5f; border-bottom:1px solid var(--travel-border); font-size:14px; }
+.legend-transit::before, .legend-walk::before { content:""; display:inline-block; width:23px; border-top:4px solid var(--travel-transit); margin-right:8px; vertical-align:middle; }
+.legend-walk::before { border-color:var(--travel-walk); border-top-style:dashed; }
+.layout-stacked .map-equivalent, .layout-stacked .place-preview, .layout-stacked .route-panel { margin:12px 18px; }
+.layout-stacked .route-panel > h3, .layout-stacked .route-panel > label { display:none; }
+.layout-stacked .route-panel > div { padding:6px 0; border:0; }
+.layout-stacked .route-panel > div > p:first-child { display:none; }
+.layout-stacked .timeline { padding-left:23px; border:0; position:relative; }
+.layout-stacked .timeline::before { content:""; position:absolute; left:7px; top:20px; bottom:25px; width:2px; background:#cbdad3; }
+.layout-stacked .place-card { position:relative; padding:20px; border-radius:18px; margin-bottom:12px; }
+.layout-stacked .place-card::before { content:""; position:absolute; width:12px; height:12px; border:3px solid var(--travel-bg); background:var(--travel-primary); box-shadow:0 0 0 1px #a9beb4; border-radius:50%; left:-25px; top:25px; }
+.stop-time { display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:var(--travel-muted); margin-bottom:10px; font-size:14px; }
+.stop-time strong { font-size:18px; color:var(--travel-primary); }
+.place-card h3 { margin:0 0 14px; font-size:22px; }
+.node-number { border-radius:8px; width:30px; height:30px; font-size:17px; }
+.layout-stacked .transit-leg { background:transparent; border:0; border-radius:0; padding:10px 4px 18px; margin:0; color:var(--travel-muted); font-size:14px; }
+.transit-heading { font-weight:600; }
+.line-badge { padding:3px 8px; color:#fff; border-radius:5px; display:inline-block; }
+.travel-template .transit-leg.selected { border-left:3px solid var(--travel-walk); padding-left:12px; }
+.place-media { background:#f0f5ed; border-radius:16px; padding:12px; grid-template-columns:minmax(0,1fr) 140px; align-items:center; gap:16px; }
+.place-media aside { min-width:0; }
+.place-media aside > strong { display:block; margin-bottom:10px; }
+.place-media .external-links a { background:#e6f0eb; border:1px solid var(--travel-border); border-radius:10px; padding:10px; justify-content:center; width:100%; font-size:14px; }
+.place-media small { display:block; margin-top:8px; }
+.photo-gallery > span { display:none; }
+.photo-gallery > p { display:none; }
+.photo-gallery > a { padding:6px 0; font-size:13px; min-height:0; color:#607467; }
+.opening-milestones { display:flex; padding:16px 0; background:#fff4e6; border:1px solid #f0d7b8; border-radius:12px; margin:16px 0; color:#875222; }
+.opening-milestones > div { flex:1; text-align:center; border-right:1px solid #ecd0ad; }
+.opening-milestones > div:last-child { border:0; }
+.opening-milestones strong { display:block; font-size:25px; }
+.opening-milestones span { font-size:14px; }
+.empty-day { text-align:center; padding:70px 20px; color:var(--travel-muted); background:white; border:1px solid var(--travel-border); border-radius:18px; margin:20px 0; }
+@media (max-width:540px) { .place-media { grid-template-columns:1fr; } .place-media aside .external-links { flex-direction:row; } .place-media .external-links a { width:auto; flex:1; } .layout-stacked .place-card { padding:16px; } }
+@media (min-width:1024px) { .travel-template.layout-stacked { padding:0 24px 48px; } .layout-stacked .trip-header { margin:0 -24px 24px; padding:30px; } .layout-stacked .map-canvas-wrap { height:460px; } }
+@media (max-width:359px) { .layout-stacked .trip-header { margin-inline:-12px; } }
