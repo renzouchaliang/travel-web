@@ -60,3 +60,4 @@ The default Pages SPA fallback supports client-side navigation when no top-level
 For manual publishing, run `npm ci && npm run build`, then use Cloudflare Pages Direct Upload for `dist/`. Choose Git integration or Direct Upload when creating the project; Cloudflare treats these as separate project modes.
 
 Publishing requires a Cloudflare account and deployment authorization. This setup does not create or publish a Cloudflare project. Variables prefixed with `VITE_` are embedded in public JavaScript and must never contain private credentials. Private API keys need a separate server-side design.
+Auto-deploy test
