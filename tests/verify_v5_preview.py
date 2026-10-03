@@ -1,12 +1,14 @@
 from playwright.sync_api import sync_playwright
 MOCK='''(() => {
-window.mapChecks={queries:[],fits:[],lines:[]};
-class Marker {constructor(o){this.o=o;} on(){} off(){} setzIndex(){}}
+window.mapChecks={queries:[],fits:[],lines:[],markers:[],zoom:12,events:{}};
+class Marker {constructor(o){this.o=o;} on(){} off(){} setzIndex(){} show(){if(this.o.content)this.o.content.hidden=false;} hide(){if(this.o.content)this.o.content.hidden=true;}}
 class Polyline {constructor(o){this.o=o;}}
-class Map {on(n,f){if(n==='complete')queueMicrotask(f);} remove(){window.mapChecks.lines=[];} add(items){window.mapChecks.lines=items.filter(x=>x instanceof Polyline).map(x=>x.o);} setFitView(ms){window.mapChecks.fits.push(ms.map(m=>m.o.position));} setZoomAndCenter(z,p){window.mapChecks.fits.push([p]);} setStatus(){} resize(){} destroy(){}}
+class Map {constructor(el){this.el=el;} on(n,f){if(n==='complete')queueMicrotask(f);window.mapChecks.events[n]=f;} off(n){delete window.mapChecks.events[n];} getZoom(){return window.mapChecks.zoom;} remove(){window.mapChecks.lines=[];this.el.replaceChildren();} add(items){window.mapChecks.lines=items.filter(x=>x instanceof Polyline).map(x=>x.o);window.mapChecks.markers=items.filter(x=>x instanceof Marker).map(x=>x.o); for(const marker of window.mapChecks.markers)if(marker.content)this.el.append(marker.content);} setFitView(ms){window.mapChecks.fits.push(ms.map(m=>m.o.position));} setZoomAndCenter(z,p){window.mapChecks.zoom=z;window.mapChecks.fits.push([p]);window.mapChecks.events.zoomend?.();} setStatus(){} resize(){} destroy(){this.el.replaceChildren();}}
+class InfoWindow {setContent(){} open(){} close(){}}
+
 class Planner {constructor(o){} clear(){} search(a,b,cb){window.mapChecks.queries.push([a,b]); queueMicrotask(()=>cb('complete',{routes:[{steps:[{path:[a,b]}],time:900,distance:1000}],plans:[{segments:[{transit_mode:'SUBWAY',transit:{path:[a,b],lines:[{name:'地铁4号线'}]}}],time:1800,distance:4000}]}));}}
 class Transfer extends Planner {search(a,b,cb){super.search(a,b,(status,data)=>cb(status,{plans:data.plans}));}}
-window.AMap={Map,Marker,Polyline,Walking:Planner,Transfer,plugin:(n,cb)=>cb()};
+window.AMap={Map,Marker,Polyline,InfoWindow,Walking:Planner,Transfer,plugin:(n,cb)=>cb()};
 })()'''
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
@@ -15,7 +17,7 @@ with sync_playwright() as p:
   page.add_init_script(MOCK)
   page.goto('http://127.0.0.1:5173/?trip=changsha-2026-10',wait_until='domcontentloaded')
   page.wait_for_function('window.mapChecks.queries.length===2 && window.mapChecks.lines.length===2')
-  assert page.get_by_role('tab').count()==4
+  assert page.locator('.day-tabs [role=tab]').count()==4
   assert page.locator('.place-media img').count()==2
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
   checks=page.evaluate('window.mapChecks')
@@ -24,12 +26,34 @@ with sync_playwright() as p:
   assert len(checks['lines'])==2
   text=page.locator('body').inner_text()
   for forbidden in ['资料来源','图源：','核查时间','评分暂无','未确认','estimate']:assert forbidden not in text,forbidden
-  page.locator('.restaurant-group').first.get_by_role('button',name='再看 1 家备选').click()
-  assert page.locator('.restaurant-group').first.locator('.restaurant-row').count()==4
-  page.get_by_role('tab').nth(2).click();assert page.get_by_text('这一天的行程待补充').is_visible();assert page.locator('.place-card').count()==0
-  page.get_by_role('tab').nth(1).click();assert page.locator('.place-card').count()>0
-  page.get_by_role('tab').first.click();page.get_by_role('button',name='放大地图',exact=True).click();assert page.get_by_role('dialog').count()==1;page.keyboard.press('Escape');assert page.get_by_role('dialog').count()==0
+  assert page.locator('.route-chips').inner_text().find('希尔顿') == -1
+  assert page.locator('.travel-map-label').filter(has_text='酒店').count()==1
+  page.get_by_role('button',name='餐饮点',exact=True).click()
+  page.locator('.travel-map-dining').first.wait_for(state='attached')
+  assert page.locator('.travel-map-dining:visible').count()==0
+  page.evaluate("window.mapChecks.zoom=15;window.mapChecks.events.zoomend()")
+  assert page.locator('.travel-map-dining:visible').count()==4
+  assert page.locator('.travel-map-dining .travel-map-label:visible').count()==0
+  page.evaluate("window.mapChecks.zoom=17;window.mapChecks.events.zoomend()")
+  assert page.locator('.travel-map-dining .travel-map-label:visible').count()==4
+  assert '（' not in page.locator('.travel-map-dining').first.inner_text()
+  page.locator('.dining-tabs [role=tab]').nth(1).click()
+  assert page.locator('.restaurant-group').count()==1
+  assert page.locator('.restaurant-group .restaurant-row').count()==4
+  page.locator('#stop-d1-academy .place-title-button').click()
+  assert page.locator('.travel-map-pin.active').count()==1
+  page.locator('.day-tabs [role=tab]').nth(2).click();assert page.get_by_text('这一天的行程待补充').is_visible();assert page.locator('.place-card').count()==0
+  page.locator('.day-tabs [role=tab]').nth(1).click();assert page.locator('.place-card').count()>0
+  page.locator('.day-tabs [role=tab]').first.click();page.get_by_role('button',name='放大地图',exact=True).click();assert page.get_by_role('dialog').count()==1; assert page.get_by_role('button',name='退出全屏 ✕').is_visible(); assert page.locator('.map-canvas-wrap').bounding_box()['height']>650; page.screenshot(path=f'/tmp/travel-map-full-{width}.png');page.keyboard.press('Escape');assert page.get_by_role('dialog').count()==0
   page.screenshot(path=f'/tmp/travel-v5-{width}.png',full_page=True)
+  if width==390:
+   page.set_viewport_size({'width':844,'height':390})
+   page.get_by_role('button',name='放大地图',exact=True).click()
+   assert page.locator('.map-canvas-wrap').bounding_box()['height']>280
+   page.get_by_role('button',name='退出全屏 ✕').click()
+   assert page.get_by_role('dialog').count()==0
+  page.locator('.day-tabs [role=tab]').nth(3).click()
+  assert page.get_by_text('20:40 出发',exact=True).is_visible()
   assert not errors,errors
   print('PASS',width,'four days, blank date, V5 media, dining, modal, real route calls, station excluded')
   page.close()

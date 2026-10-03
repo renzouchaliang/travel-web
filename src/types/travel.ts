@@ -45,6 +45,7 @@ export interface Place {
   id: ID;
   name: string;
   branchName?: string;
+  mapLabel?: string;
   kind: PlaceKind;
   coordinate?: Coordinate; // 不知道时留空，不生成假坐标
   providerIds?: Record<string, string>;
@@ -68,6 +69,20 @@ export interface Place {
     sourceUrl: string;
   };
 }
+export interface IntercityTransport {
+  direction: "arrival" | "departure";
+  mode: "rail" | "flight" | "coach";
+  origin?: string;
+  destination?: string;
+  departureTime?: string;
+  arrivalTime?: string;
+  serviceNumber?: string;
+  carriage?: string;
+  seat?: string;
+  terminal?: string;
+  gate?: string;
+  boardingDeadline?: string;
+}
 export interface Stop {
   id: ID;
   placeId: ID;
@@ -79,6 +94,8 @@ export interface Stop {
   description?: string;
   timeLabel?: string;
   mapOverview?: boolean;
+  transport?: IntercityTransport;
+  visitPurpose?: "sightseeing" | "photo" | "museum" | "park" | "free-time";
 }
 export interface RouteLeg {
   id: ID;
@@ -119,6 +136,7 @@ export interface RestaurantGroup {
   description?: string;
   candidates: { placeId: ID; distance?: Distance }[];
   initialVisible: number; // 默认 3
+  selectionCriteria?: { radiusMeters: number; minCandidates: number; platform: string; minRating?: number; ratingScale?: number; popularityAlternative?: boolean };
 }
 export interface Day {
   id: ID;

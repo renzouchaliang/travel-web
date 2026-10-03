@@ -2,6 +2,7 @@ import { applyV5Presentation } from "./v5-presentation";
 import source from "./trip-changsha-2026.json" with { type: "json" };
 import type {
   Coordinate,
+  IntercityTransport,
   Day,
   Distance,
   ExternalLink,
@@ -16,6 +17,9 @@ import type {
 type RawExport = typeof source;
 type RawStop = NonNullable<RawExport["trip"]["days"][number]["stops"]>[number];
 type ExportStop = RawStop & {
+  mapLabel?: string;
+  transport?: IntercityTransport;
+  visitPurpose?: Stop["visitPurpose"];
   coordinateReference?: {
     lng: number;
     lat: number;
@@ -140,10 +144,13 @@ export function adaptChangsha(input: ChangshaExport): Trip {
     places[stop.placeId] = {
       id: stop.placeId,
       name: stop.name,
+      mapLabel: stop.mapLabel,
       kind,
       address: stop.address ?? undefined,
       coordinate: coordinate(stop),
       providerIds: { amapCity: exported.city },
+      opening: stop.practicalInfo.openingHours ? { text: stop.practicalInfo.openingHours, status: "unverified", sourceIds: stop.sourceIds } : undefined,
+      ticket: stop.practicalInfo.ticketInfo ? { text: stop.practicalInfo.ticketInfo, status: "unverified", sourceIds: stop.sourceIds } : undefined,
       links: links(stop.placeId, stop),
       // Unknown-rights reference images are never embedded by PhotoGallery.
       photos: image
@@ -226,6 +233,13 @@ export function adaptChangsha(input: ChangshaExport): Trip {
             : undefined),
         role,
         mapOverview: stop.type !== "transport",
+        visitPurpose: stop.visitPurpose,
+        transport: stop.transport ?? (stop.placeId === exported.returnTransport.departurePlaceId && day.date === exported.returnTransport.date ? {
+          direction: "departure", mode: "rail", origin: stop.name,
+          departureTime: exported.returnTransport.departureTime,
+          serviceNumber: exported.returnTransport.trainNumber ?? undefined,
+          destination: exported.returnTransport.destination ?? undefined,
+        } : undefined),
         description: isReturn ? "游览结束后返回酒店休息。" : stop.description ?? undefined,
         timeLabel: stop.arrivalTime ? undefined : stop.timeWindow ?? undefined,
         note: stop.notes.filter((note) => !/未确认|未提供|未核|待核|来源|坐标|授权/.test(note)).join("；") || undefined,

@@ -14,9 +14,9 @@ export function dayMapScene(
       stopId: stop.id,
       time:
         stop.startTime || stop.endTime
-          ? `${stop.startTime ?? "未定"}–${stop.endTime ?? "未定"}（计划）`
-          : "时间未确认",
-      description: stop.note ?? place.summary ?? "",
+          ? [stop.startTime, stop.endTime].filter(Boolean).join("—")
+          : "",
+      description: stop.description ?? stop.note ?? place.summary ?? "",
     });
   }
   const leg = day.legs.find((item) => item.id === selectedLegId);

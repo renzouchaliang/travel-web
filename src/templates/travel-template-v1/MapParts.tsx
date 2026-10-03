@@ -50,7 +50,7 @@ export function MapControls({
       >
         周边地点
       </button>
-      <button onClick={() => selection.setMapExpanded(!selection.mapExpanded)}>
+      <button className="map-expand-toggle" onClick={() => selection.setMapExpanded(!selection.mapExpanded)}>
         {selection.mapExpanded ? "关闭全屏地图" : "放大地图"}
       </button>
       {!selection.mapExpanded && (
@@ -58,7 +58,7 @@ export function MapControls({
           {collapsed ? "展开地图" : "收起地图"}
         </button>
       )}
-      <button
+      {!selection.mapExpanded && <button
         className="touch-control"
         aria-pressed={selection.mapInteractionEnabled}
         onClick={() =>
@@ -66,7 +66,7 @@ export function MapControls({
         }
       >
         {selection.mapInteractionEnabled ? "完成" : "操作地图"}
-      </button>
+      </button>}
     </div>
   );
 }

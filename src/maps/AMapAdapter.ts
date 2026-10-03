@@ -5,6 +5,7 @@ import type {
   RouteSegment,
   TravelMode,
 } from "../types/travel";
+import { mapLabel } from "./labels";
 import type { MapAdapter, MapScene, RouteRequest } from "./MapAdapter";
 // Supplier objects are confined to this boundary. No security key is accepted here.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,14 +57,6 @@ function loadSDK(config: AMapConfig): Promise<SDK> {
   });
   return sdkPromise;
 }
-const escapeLabel = (name: string) =>
-  name.replace(
-    /[&<>"']/g,
-    (character) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        character
-      ]!,
-  );
 const gcj = (c?: Coordinate) => {
   if (!c || c.crs !== "GCJ02") throw new Error("coordinate-system");
   return [c.lng, c.lat];
@@ -84,6 +77,16 @@ export class AMapAdapter implements MapAdapter {
   private disposed = false;
   private routeColors = { walk: "", transit: "" };
   private select?: (id: string) => void;
+  private diningMarkers: { marker: SDK; element: HTMLElement; selected: boolean }[] = [];
+  private zoomChanged = () => {
+    const zoom = this.map?.getZoom?.() ?? 12;
+    for (const { marker, element, selected } of this.diningMarkers) {
+      const visible = zoom >= 15 || selected;
+      if (visible) marker.show?.(); else marker.hide?.();
+      element.hidden = !visible;
+      element.classList.toggle("show-name", zoom >= 17 || selected);
+    }
+  };
   constructor(private config: AMapConfig) {}
   async mount(
     container: HTMLElement,
@@ -105,6 +108,7 @@ export class AMapAdapter implements MapAdapter {
       touchZoom: false,
     });
     this.map!.on("dragstart", events.drag);
+    this.map!.on("zoomend", this.zoomChanged);
     await new Promise<void>((resolve, reject) => {
       const timer = setTimeout(
         () => reject(new Error("basemap-timeout")),
@@ -133,20 +137,33 @@ export class AMapAdapter implements MapAdapter {
     this.overlayCleanup.forEach((cleanup) => cleanup());
     this.overlayCleanup = [];
     this.overlays = [];
+    this.diningMarkers = [];
+    const hotelCount = places.filter((p) => p.kind === "hotel").length;
     places.forEach((p, index) => {
       if (p.coordinate?.crs !== "GCJ02") return;
+      const dining = p.kind === "restaurant";
+      const selected = p.id === selectedPlaceId;
+      const element = document.createElement("button");
+      element.type = "button";
+      element.className = dining ? "travel-map-dining" : "travel-map-pin";
+      element.classList.toggle("active", selected);
+      element.setAttribute("aria-label", p.name);
+      const dot = document.createElement("span");
+      dot.className = "travel-map-dot";
+      if (!dining) dot.textContent = ["station", "airport"].includes(p.kind) ? "站" : p.kind === "hotel" ? "宿" : String(places.slice(0, index + 1).filter((place) => !["station", "airport", "restaurant"].includes(place.kind)).length);
+      const label = document.createElement("span");
+      label.className = "travel-map-label";
+      label.textContent = p.kind === "hotel" && hotelCount > 1 && !p.mapLabel ? `酒店${places.filter((place) => place.kind === "hotel").findIndex((place) => place.id === p.id) + 1}` : mapLabel(p, hotelCount);
+      element.append(dot, label);
       const marker = new this.sdk!.Marker({
-        position: gcj(p.coordinate),
-        title: p.name,
-        label: {
-          content: `<span class="amap-poi ${p.id === selectedPlaceId ? "active" : ""}">${p.kind === "restaurant" ? "餐饮候选" : ["station", "airport"].includes(p.kind) ? "起／返" : places.slice(0, index + 1).filter((place) => !["station", "airport", "restaurant"].includes(place.kind)).length} · ${escapeLabel(p.name)}</span>`,
-          direction: "top",
-        },
+        position: gcj(p.coordinate), content: element, anchor: "bottom-center",
+        zIndex: dining ? 80 : selected ? 220 : 150,
       });
-      marker.setzIndex?.(p.id === selectedPlaceId ? 200 : 100);
       const select = () => this.select?.(p.id);
-      marker.on("click", select);
-      this.overlayCleanup.push(() => marker.off("click", select));
+      // DOM click supports keyboard activation of the button as well as touch.
+      element.addEventListener("click", select);
+      this.overlayCleanup.push(() => element.removeEventListener("click", select));
+      if (dining) this.diningMarkers.push({ marker, element, selected });
       this.overlays.push(marker);
     });
     for (const result of results) {
@@ -161,6 +178,7 @@ export class AMapAdapter implements MapAdapter {
       }
     }
     this.map.add(this.overlays);
+    this.zoomChanged();
     const selected = places.find(
       (p) => p.id === selectedPlaceId && p.coordinate?.crs === "GCJ02",
     );
@@ -180,12 +198,13 @@ export class AMapAdapter implements MapAdapter {
           visit.description.length > 180
             ? visit.description.slice(0, 180) + "…"
             : visit.description;
-        content.append(time, description);
+        if (visit.time) content.append(time);
+        if (description.textContent) content.append(description);
       }
       if (!visits.length) {
         const description = document.createElement("p");
         description.textContent =
-          selected.summary ?? "候选地点，未安排停留时间。";
+          selected.kind === "restaurant" ? [selected.foodTags?.join(" / "), selected.address].filter(Boolean).join(" · ") : selected.summary ?? "";
         content.append(description);
       }
       this.popup ??= new this.sdk.InfoWindow({ autoMove: false });
@@ -283,7 +302,7 @@ export class AMapAdapter implements MapAdapter {
             const plans = data.plans ?? [];
             const matches = (plan: SDK) => {
               const transit = (plan.segments ?? []).filter((s: SDK) => s.transit_mode !== "WALK");
-              return transit.length > 0 && transit.every((s: SDK) => s.transit_mode === "SUBWAY" && (s.transit?.lines ?? []).some((line: SDK) => String(line.name).includes(leg.preferredLine!)));
+              return transit.length > 0 && transit.every((s: SDK) => s.transit_mode === "SUBWAY" && (s.transit?.lines ?? []).some((line: SDK) => (String(line.name).match(/\d+号线/)?.[0] === leg.preferredLine || String(line.name) === leg.preferredLine)));
             };
             const preferred = leg.preferredLine ? plans.find(matches) : undefined;
             const route = data.routes?.[0] ?? preferred ?? plans[0];
@@ -363,6 +382,8 @@ export class AMapAdapter implements MapAdapter {
     this.overlays = [];
     this.popup?.close();
     this.popup = undefined;
+    this.map?.off?.("zoomend", this.zoomChanged);
+    this.diningMarkers = [];
     this.map?.destroy();
     this.map = undefined;
   }

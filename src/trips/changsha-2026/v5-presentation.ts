@@ -10,6 +10,8 @@ export function applyV5Presentation(trip: Trip): Trip {
     if (leg.id === "d1-l3") leg.routingFromPlaceId = "academy-entrance";
     if (leg.id === "d1-l5") leg.routingFromPlaceId = "hnu-metro";
   }
+  if (trip.places.square) trip.places.square.mapLabel = "湖大广场";
+  if (trip.places["lushan-food"]) trip.places["lushan-food"].mapLabel = "麓山南路逛吃";
   const academy = trip.places.academy;
   if (academy) {
     academy.openingMilestones = [
@@ -24,6 +26,12 @@ export function applyV5Presentation(trip: Trip): Trip {
       { id: "academy-v5-guide", platform: "携程", label: "携程攻略", action: "guide", targetType: "detail", url: "https://gs.ctrip.com/html5/you/sight/changsha148/9013.html" },
       { id: "academy-v5-booking", platform: "官方", label: "官网预约", action: "booking", targetType: "detail", url: "https://ylsy.hnu.edu.cn/wbly/cgdn/zxdp.htm" },
     ];
+  }
+  for (const day of trip.days) {
+    if (day.restaurantGroups.length) for (const group of day.restaurantGroups) group.initialVisible = 5;
+    for (const stop of day.stops) {
+      if (stop.id === "d1-arrival") stop.transport ??= { direction: "arrival", mode: "rail", destination: "长沙南站", arrivalTime: stop.startTime };
+    }
   }
   for (const day of trip.days) {
     for (const stop of day.stops) {

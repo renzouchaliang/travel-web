@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Coordinate, Day, RouteResult, Trip } from "../../types/travel";
 import type { MapAdapter, RouteRequest } from "../../maps/MapAdapter";
+import { mapLabel } from "../../maps/labels";
 import { dayMapScene } from "../../maps/sequence";
 import { routeCacheKey } from "../../maps/MapAdapter";
 import type { TripSelection } from "./useTripSelection";
@@ -233,7 +234,7 @@ export function TripMap({
       aria-modal={mapExpanded ? true : undefined}
       aria-label="当天地图"
     >
-      <h2>今天去哪里</h2>
+      <div className="map-heading"><h2>今天去哪里</h2>{mapExpanded && <button className="map-exit" onClick={close}>退出全屏 ✕</button>}</div>
       <p className="map-sequence-note">
         点路段查看交通路线，点“全天”恢复。自由逛吃只标地点。
       </p>
@@ -244,7 +245,7 @@ export function TripMap({
       />
       <div className="route-chips" aria-label="地图路段选择">
         <button aria-pressed={!selectedLegId} onClick={selection.overview}>全天</button>
-        {day.legs.filter((l) => l.mapDisplay !== "text-only").map((l) => <button key={l.id} aria-pressed={selectedLegId === l.id} onClick={() => selection.selectLeg(l.id)}>{trip.places[day.stops.find((s) => s.id === l.fromStopId)!.placeId].name} → {trip.places[day.stops.find((s) => s.id === l.toStopId)!.placeId].name}</button>)}
+        {day.legs.filter((l) => l.mapDisplay !== "text-only").map((l) => <button key={l.id} aria-pressed={selectedLegId === l.id} onClick={() => selection.selectLeg(l.id)}>{mapLabel(trip.places[day.stops.find((s) => s.id === l.fromStopId)!.placeId])} → {mapLabel(trip.places[day.stops.find((s) => s.id === l.toStopId)!.placeId])}</button>)}
       </div>
       <div
         className={`map-canvas-wrap ${collapsed && !mapExpanded ? "map-collapsed" : ""} ${mapInteractionEnabled || mapExpanded ? "interactive" : ""}`}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Place, Stop, Trip } from "../../types/travel";
+import type { IntercityTransport, Place, Stop, Trip } from "../../types/travel";
 import { ExternalLinks } from "./ExternalLinks";
 import { PhotoGallery } from "./PhotoGallery";
 export function Address({ place }: { place: Place }) {
@@ -31,13 +31,23 @@ export function HotelCard({ place }: { place: Place }) {
     </>
   );
 }
-export function TransportCard({ place }: { place: Place }) {
-  return (
-    <>
-      <p>{place.kind === "airport" ? "机场" : "车站"} · 抵达 / 离开</p>
-      <Address place={place} />
-    </>
-  );
+export function TransportCard({ place, transport }: { place: Place; transport?: IntercityTransport }) {
+  if (!transport) return <Address place={place} />;
+  const facts = [
+    transport.serviceNumber && `班次 ${transport.serviceNumber}`,
+    transport.carriage && `车厢 ${transport.carriage}`,
+    transport.seat && `座位 ${transport.seat}`,
+    transport.terminal && `航站楼 ${transport.terminal}`,
+    transport.gate && `检票口 ${transport.gate}`,
+    transport.boardingDeadline && `停止检票 ${transport.boardingDeadline}`,
+  ].filter(Boolean);
+  return <div className="transport-booking">
+    <p className="transport-direction">{transport.direction === "arrival" ? "抵达" : "离开"} · {transport.mode === "flight" ? "航班" : transport.mode === "rail" ? "高铁／火车" : "长途汽车"}</p>
+    <strong>{[transport.origin, transport.destination].filter(Boolean).join(" → ")}</strong>
+    {(transport.departureTime || transport.arrivalTime) && <p>{[transport.departureTime && `${transport.departureTime} 出发`, transport.arrivalTime && `${transport.arrivalTime} 抵达`].filter(Boolean).join(" · ")}</p>}
+    {!!facts.length && <div className="booking-facts">{facts.map((fact) => <span key={String(fact)}>{fact}</span>)}</div>}
+    <Address place={place} />
+  </div>;
 }
 export function PlaceCard({
   place,
@@ -57,10 +67,11 @@ export function PlaceCard({
   return (
     <article
       id={stop ? `stop-${stop.id}` : undefined}
-      className={`travel-card place-card ${selected ? "selected" : ""}`}
+      className={`travel-card place-card card-${stop?.transport ? stop.transport.direction : place.kind} ${selected ? "selected" : ""}`}
     >
       {stop && <div className="stop-time"><strong>{stop.startTime ? `${stop.startTime}${stop.endTime ? `—${stop.endTime}` : ""}` : stop.timeLabel ?? (stop.role === "free-time" ? "时间自由" : "")}</strong>{stay && <span>建议游览 {stay.min}–{stay.max} 分钟</span>}</div>}
-      <h3>{number && <span className="node-number">{number}</span>} {place.name}{place.branchName && ` · ${place.branchName}`}</h3>
+      <h3 className="place-title">{number && <span className="node-number">{number}</span>}<button className="place-title-button" onClick={onMap} aria-label={`在地图看${place.name}`}>{place.name}{place.branchName && ` · ${place.branchName}`}<span aria-hidden="true" className="inline-map-icon">⌖</span></button></h3>
+      {stop?.visitPurpose && <span className="purpose-tag">{{ sightseeing: "游览", photo: "拍照打卡", museum: "场馆参观", park: "公园散步", "free-time": "自由活动" }[stop.visitPurpose]}</span>}
       {place.kind === "attraction" && <div className="place-media"><PhotoGallery photos={place.photos} /><aside><strong>看看怎么逛</strong><ExternalLinks links={place.links.filter((l) => l.platform !== "高德")} /><small>景点介绍、照片与游客点评</small></aside></div>}
       <p>{stop?.description ?? place.summary}</p>
       {stop?.note && <p>{stop.note}</p>}
@@ -68,7 +79,7 @@ export function PlaceCard({
       {place.kind === "hotel" ? (
         <HotelCard place={place} />
       ) : ["station", "airport"].includes(place.kind) ? (
-        <TransportCard place={place} />
+        <TransportCard place={place} transport={stop?.transport} />
       ) : (
         <Address place={place} />
       )}
@@ -89,7 +100,7 @@ export function PlaceCard({
           ),
       )}
       <ExternalLinks links={place.kind === "attraction" ? place.links.filter((l) => l.action === "navigation") : place.links} />
-      <button onClick={onMap}>在地图看</button>
+
     </article>
   );
 }

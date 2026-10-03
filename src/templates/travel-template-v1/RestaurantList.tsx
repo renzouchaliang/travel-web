@@ -43,17 +43,14 @@ export function RestaurantRow({
     d = candidate.distance;
   return (
     <article className="restaurant-row">
-      <h4>
-        {p.name}
-        {p.branchName && ` · ${p.branchName}`}
-      </h4>
+      <h4><button className="restaurant-title-button" onClick={onMap} aria-label={`在地图看${p.name}`}>{p.name}{p.branchName && ` · ${p.branchName}`} <span aria-hidden="true" className="inline-map-icon">⌖</span></button></h4>
       <p>
         {p.foodTags?.join(" / ")} · {p.address ?? p.areaId ?? "区域暂无"}
       </p>
       {d && <p>{d.kind === "straight" ? "直线约" : d.kind === "walking" ? "步行约" : "驾车约"}{d.meters < 1000 ? `${Math.round(d.meters)}米` : `${(d.meters / 1000).toFixed(1)}公里`}</p>}
       {p.rating && <p>{p.rating.platform} {p.rating.value}/{p.rating.scale}</p>}
       <ExternalLinks links={p.links} />
-      <button onClick={onMap}>在地图看门店</button>
+
     </article>
   );
 }
@@ -66,10 +63,19 @@ export function RestaurantList({
   day: Day;
   onMap: (id: string) => void;
 }) {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  return <section id="dining"><h2>沿途吃什么</h2><p>按区域选一家，不必全部打卡。</p>{day.restaurantGroups.map((g) => {
-    const key = `${day.id}:${g.id}`;
-    const candidates = g.candidates;
-    return <section className="travel-card restaurant-group" key={key}><h3>{g.title}</h3><p>{g.description}</p>{(expanded[key] ? candidates : candidates.slice(0, g.initialVisible ?? 3)).map((c) => <RestaurantRow key={c.placeId} trip={trip} candidate={c} onMap={() => onMap(c.placeId)} />)}{candidates.length > (g.initialVisible ?? 3) && <button aria-expanded={!!expanded[key]} onClick={() => setExpanded((v) => ({ ...v, [key]: !v[key] }))}>{expanded[key] ? "收起备选" : `再看 ${candidates.length - (g.initialVisible ?? 3)} 家备选`}</button>}</section>;
-  })}</section>;
+  const [activeGroups, setActiveGroups] = useState<Record<string, string>>({});
+  const active = day.restaurantGroups.find((g) => g.id === activeGroups[day.id]) ?? day.restaurantGroups[0];
+  const choose = (id: string) => setActiveGroups((v) => ({ ...v, [day.id]: id }));
+  return <section id="dining"><h2>沿途吃什么</h2><p>按所在位置选一家，点击店名在地图看。</p>
+    <div className="dining-tabs" role="tablist" aria-label="附近餐饮区域">{day.restaurantGroups.map((g, i) => <button key={g.id} id={`dining-tab-${day.id}-${g.id}`} role="tab" aria-selected={active?.id === g.id} aria-controls={`dining-panel-${day.id}`} tabIndex={active?.id === g.id ? 0 : -1} onClick={() => choose(g.id)} onKeyDown={(e) => {
+      let next = i;
+      if (e.key === "ArrowRight") next = (i + 1) % day.restaurantGroups.length;
+      else if (e.key === "ArrowLeft") next = (i + day.restaurantGroups.length - 1) % day.restaurantGroups.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = day.restaurantGroups.length - 1;
+      else return;
+      e.preventDefault(); choose(day.restaurantGroups[next].id); document.getElementById(`dining-tab-${day.id}-${day.restaurantGroups[next].id}`)?.focus();
+    }}>{g.title}</button>)}</div>
+    {active && <section className="travel-card restaurant-group" id={`dining-panel-${day.id}`} role="tabpanel" aria-labelledby={`dining-tab-${day.id}-${active.id}`}><p>{active.description}</p>{active.candidates.map((c) => <RestaurantRow key={c.placeId} trip={trip} candidate={c} onMap={() => onMap(c.placeId)} />)}</section>}
+  </section>;
 }

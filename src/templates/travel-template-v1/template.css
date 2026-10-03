@@ -534,3 +534,51 @@ body:has(.travel-template) {
 @media (max-width:540px) { .place-media { grid-template-columns:1fr; } .place-media aside .external-links { flex-direction:row; } .place-media .external-links a { width:auto; flex:1; } .layout-stacked .place-card { padding:16px; } }
 @media (min-width:1024px) { .travel-template.layout-stacked { padding:0 24px 48px; } .layout-stacked .trip-header { margin:0 -24px 24px; padding:30px; } .layout-stacked .map-canvas-wrap { height:460px; } }
 @media (max-width:359px) { .layout-stacked .trip-header { margin-inline:-12px; } }
+/* Map labels: primary stops stay prominent, dining reveals with zoom. */
+.travel-template .travel-map-pin, .travel-template .travel-map-dining { min-height:0; padding:0; border:0; background:transparent; display:flex; align-items:center; gap:4px; white-space:nowrap; font:12px/1.25 system-ui,sans-serif; }
+.travel-map-dot { display:flex; align-items:center; justify-content:center; width:25px; height:25px; border:2px solid white; border-radius:50%; background:#103e42; color:white; font-size:12px; box-shadow:0 1px 4px #183d4040; }
+.travel-map-label { background:#fffffff0; color:#183d40; padding:4px 6px; border-radius:5px; box-shadow:0 1px 3px #183d4025; }
+.travel-map-dining .travel-map-dot { width:8px; height:8px; background:#e87932; border:1px solid white; }
+.travel-map-dining .travel-map-label { display:none; font-size:11px; }
+.travel-map-dining.show-name .travel-map-label { display:block; }
+.travel-template .travel-map-dining[hidden] { display:none; }
+.travel-map-pin.active .travel-map-dot, .travel-map-dining.active .travel-map-dot { outline:2px solid #c9632b; outline-offset:2px; }
+.map-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:16px 20px 0; }
+.map-heading h2 { margin:0; }
+.travel-template .map-exit { background:#103e42; color:white; border:0; min-height:40px; padding:7px 12px; font-size:14px; border-radius:9px; }
+.travel-template .map-panel.map-expanded { width:100%; max-width:none; height:100dvh; max-height:100dvh; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom); overflow:hidden; display:grid; grid-template-rows:auto auto auto minmax(0,1fr); gap:0; border:0; }
+.map-expanded .map-heading { padding:8px 12px; }
+.map-expanded .map-heading h2 { font-size:17px; }
+.travel-template .map-expanded .map-controls { margin:0; padding:3px 12px 7px; flex-wrap:nowrap; overflow-x:auto; }
+.map-expanded .map-controls button { min-height:34px; font-size:13px; padding:5px 10px; flex-shrink:0; }
+.map-expanded .map-expand-toggle { display:none; }
+.map-expanded .map-sequence-note, .map-expanded .map-equivalent, .map-expanded .place-preview, .map-expanded .route-panel, .map-expanded .map-legend { display:none; }
+.map-expanded .route-chips { padding:6px 12px; }
+.map-expanded .route-chips button { min-height:32px; font-size:12px; padding:5px 10px; }
+.travel-template .map-expanded .map-canvas-wrap { height:100%; min-height:0; margin:0; }
+@media (orientation:landscape) and (max-height:550px) { .map-expanded .map-heading { padding:4px 12px; } .map-expanded .map-controls { position:absolute; z-index:5; top:4px; left:130px; right:115px; max-height:38px; } .travel-template .map-panel.map-expanded { grid-template-rows:auto auto minmax(0,1fr); } .map-expanded .map-exit { min-height:32px; } }
+/* Cards retain prominent names/times with compact secondary controls. */
+.travel-template .place-title, .travel-template .restaurant-row h4 { display:flex; align-items:center; gap:8px; }
+.travel-template .place-title-button, .travel-template .restaurant-title-button { background:transparent; border:0; min-height:36px; padding:0; color:var(--travel-primary); font:inherit; font-weight:700; text-align:left; line-height:1.35; }
+.inline-map-icon { font-size:17px; color:var(--travel-muted); padding-left:5px; }
+.place-card > p, .place-card details, .restaurant-row p { font-size:14px; line-height:1.5; }
+.place-card > .external-links a, .restaurant-row .external-links a, .place-card > div > button { font-size:12px; min-height:30px; padding:4px 7px; }
+.place-media .external-links a { font-size:13px; min-height:36px; padding:7px 10px; }
+.opening-milestones { padding:10px 0; margin:12px 0; }
+.opening-milestones strong { font-size:20px; }
+.opening-milestones span { font-size:12px; }
+.transport-booking { background:#f3f7f5; border-radius:10px; padding:12px; margin:12px 0; }
+.transport-direction { font-size:13px; color:var(--travel-muted); }
+.booking-facts { display:flex; flex-wrap:wrap; gap:6px; }
+.booking-facts span, .purpose-tag { font-size:12px; background:#e6efeb; padding:3px 7px; border-radius:5px; }
+.dining-tabs { display:flex; gap:8px; overflow-x:auto; padding:4px 0 12px; }
+.dining-tabs button { flex-shrink:0; border-radius:12px; font-size:14px; }
+.restaurant-row { padding:10px 0; }
+.restaurant-row p { margin:4px 0; }
+.restaurant-group > p { color:var(--travel-muted); font-size:13px; }
+.travel-template .travel-map-pin { position:relative; width:25px; height:25px; }
+.travel-template .travel-map-dining { position:relative; width:8px; height:8px; }
+.travel-map-pin .travel-map-label { position:absolute; left:30px; top:2px; }
+.travel-map-dining .travel-map-label { position:absolute; left:12px; top:-5px; }
+.map-place-popup { font-size:13px; line-height:1.45; max-width:230px; }
+.map-place-popup p { margin:5px 0; }
