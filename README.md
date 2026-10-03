@@ -45,18 +45,32 @@ For real trips, introduce `src/trips/<trip>/` for trip-specific data and layouts
 
 Put bundled photos in `src/assets/` for hashed build filenames, or public assets in `public/`. Use responsive images, useful alt text, and lazy loading for galleries. Map selection and route visualization remain open; separate future provider integration from trip data.
 
-## Publishing to Cloudflare Pages
+## Publishing to the existing Cloudflare Worker
 
-This is a static site. No Worker, database, or Cloudflare credential is required to develop or build it.
+Production uses `travel-web` at https://travel-web.renzouchaliang.workers.dev. Keep the existing Git-connected Worker and production branch `main`; do not create a separate Pages project. `wrangler.jsonc` deploys the Vite `dist/` assets and `worker/index.ts` together. Only `/_AMapService` requests run through the Worker first; other requests retain static asset serving and SPA fallback.
 
-1. Commit and push the project, including `package-lock.json`, to GitHub.
-2. Create a Cloudflare Pages project connected to `renzouchaliang/travel-web`.
-3. Use `main` as the production branch, the repository root as the root directory, `npm run build` as the build command, and `dist` as the output directory. Use the React/Vite preset or enter these settings manually.
-4. Set the build environment variable `NODE_VERSION` to `24` if the selected Cloudflare build image does not already use Node 24. Keep npm lockfile installation enabled.
-5. Deploy, then verify the day selector and mobile layout on the published site. Later production-branch pushes rebuild the site; pull requests can receive preview deployments.
+In the existing Worker's Cloudflare settings configure:
 
-The default Pages SPA fallback supports client-side navigation when no top-level `404.html` exists. This demo has no router; define routing, per-guide URLs, and search-engine requirements before adding one. `public/_headers` supplies basic response headers without restricting an undecided map or image provider.
+| Setting | Type / location | Value |
+| --- | --- | --- |
+| `AMAP_SECURITY_JS_CODE` | Runtime **Secret**, Settings → Variables and Secrets | The security code paired with your AMap JS API key |
+| `VITE_AMAP_PUBLIC_KEY` | Build variable, Settings → Builds → Variables and secrets | Your browser-visible AMap JS API key |
+| `VITE_AMAP_SERVICE_HOST` | Build variable, Settings → Builds → Variables and secrets | `https://travel-web.renzouchaliang.workers.dev/_AMapService` |
 
-For manual publishing, run `npm ci && npm run build`, then use Cloudflare Pages Direct Upload for `dist/`. Choose Git integration or Direct Upload when creating the project; Cloudflare treats these as separate project modes.
+Keep the build command `npm run build`; the deploy command is `npx wrangler deploy`. Use the repository root and Node 24. A change to either `VITE_` variable requires a new build/deployment. Add the production hostname to the key's AMap domain allowlist. Never create a `VITE_AMAP_SECURITY_JS_CODE` variable or put the security code in build configuration. Wrangler reads the runtime secret binding; no secret value belongs in this repository.
 
-Publishing requires a Cloudflare account and deployment authorization. This setup does not create or publish a Cloudflare project. Variables prefixed with `VITE_` are embedded in public JavaScript and must never contain private credentials. Private API keys need a separate server-side design.
+The existing frontend adapter passes the public service-host URL to `window._AMapSecurityConfig.serviceHost` before loading the SDK. The server proxy adds `jscode` only to fixed AMap upstream requests: `/v4/map/styles` uses `webapi.amap.com`, `/v3/vectormap` uses `fmap01.amap.com`, and other versioned services use `restapi.amap.com`. Client cookies and authorization headers are not forwarded. Redirects and upstream errors return a generic error without upstream URLs. Missing runtime configuration returns HTTP 503. This does not enable driving/transit routing; the template continues drawing simple stop-sequence polylines.
+
+For local Worker verification, build with the public variables (copy `.env.example` to `.env.local`, using a localhost service host for local testing), put the runtime secret in ignored `.dev.vars`, and run `npx wrangler dev`. `npm run dev` and `npm run preview` serve only the frontend, not the proxy. Never commit `.dev.vars` or `.env.local`.
+
+Validation:
+
+```sh
+npm ci
+npm run typecheck
+npm run build
+node --experimental-strip-types --test tests/amap-proxy.test.ts
+npx wrangler deploy --dry-run
+```
+
+After pushing, check the existing Cloudflare build/deployment status and open the Changsha page. Verify map loading and day switching after configuring both the runtime secret and build variables. No Cloudflare credential is needed to build locally; deployment uses the existing Cloudflare integration.

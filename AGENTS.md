@@ -10,4 +10,4 @@ This repository is a reusable workspace for building and publishing interactive 
 - Keep future map-provider integrations behind a small adapter. Preserve a readable itinerary for users who cannot use a map.
 - Never commit credentials. Vite client variables are public; privileged operations need a separately designed server-side service.
 - Run `npm ci` and `npm run build`, then verify changed interactions in a browser. The build includes strict TypeScript checking.
-- Deploy static output from `dist/` to Cloudflare Pages. Obtain authorization before publishing or modifying a live deployment.
+- Deploy `dist/` assets and `worker/index.ts` together to the existing Cloudflare Worker using `wrangler.jsonc`. Keep AMap security credentials in Worker secrets only. Obtain authorization before publishing or modifying a live deployment.

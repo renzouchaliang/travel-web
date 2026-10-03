@@ -7,3 +7,6 @@ dist/
 !.env.example
 *.local
 *.log
+
+.dev.vars
+.dev.vars.*
