@@ -100,7 +100,7 @@ export function PlaceCard({
           ),
       )}
       <div className="card-actions">
-      <ExternalLinks links={place.kind === "attraction" ? place.links.filter((l) => l.action === "navigation") : place.links} />
+      <ExternalLinks links={place.kind === "attraction" ? place.links.filter((l) => l.action === "location") : place.links} />
         <button className="compact-map-button" onClick={onMap}>在地图看</button>
       </div>
 

@@ -601,3 +601,6 @@ body:has(.travel-template) {
 .nearby-row summary { font-weight:600; font-size:16px; }
 .nearby-row p { font-size:14px; line-height:1.5; }
 .nearby-pin .travel-map-dot { background:#67826c; border-radius:7px; }
+
+.travel-template .day-tabs button { color:var(--day-tab-color); background:var(--day-tab-bg); border-color:var(--day-tab-color); }
+.travel-template .day-tabs button[aria-selected="true"] { background:var(--day-tab-color); color:#fff; }

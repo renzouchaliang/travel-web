@@ -1,5 +1,8 @@
+import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { Day } from "../../types/travel";
+const dayColors = [["#124448", "#e9f2ef"], ["#665080", "#f0eaf6"], ["#805326", "#fbf0df"], ["#345d8b", "#eaf1fa"]];
+
 export function DayTabs({
   days,
   active,
@@ -35,6 +38,7 @@ export function DayTabs({
       {days.map((d, i) => (
         <button
           key={d.id}
+          style={{ "--day-tab-color": dayColors[i % dayColors.length][0], "--day-tab-bg": dayColors[i % dayColors.length][1] } as CSSProperties}
           role="tab"
           id={`tab-${d.id}`}
           aria-selected={active === d.id}

@@ -18,6 +18,22 @@ with sync_playwright() as p:
   page.goto('http://127.0.0.1:5173/?trip=changsha-2026-10',wait_until='domcontentloaded')
   page.wait_for_function('window.mapChecks.queries.length===2 && window.mapChecks.lines.length===2')
   assert page.locator('.day-tabs [role=tab]').count()==4
+  colors=page.locator('.day-tabs [role=tab]').evaluate_all('(els)=>els.map(e=>getComputedStyle(e).getPropertyValue("--day-tab-color"))')
+  assert len(set(colors))==4
+  assert page.get_by_role('button',name='展开地图',exact=True).count()==0
+  assert page.get_by_role('button',name='收起地图',exact=True).count()==0
+  from urllib.parse import urlparse,parse_qs
+  navs=page.locator('.transit-leg a[href*="uri.amap.com/navigation"]')
+  assert navs.count()==4
+  for a in navs.all():
+   query=parse_qs(urlparse(a.get_attribute('href')).query)
+   assert query['from'] and query['to'] and query['mode'][0] in ['walk','bus']
+   assert '高德地图导航' in a.inner_text()
+  assert parse_qs(urlparse(page.locator('#leg-d1-l2 a').get_attribute('href')).query)['mode']==['bus']
+  assert parse_qs(urlparse(page.locator('#leg-d1-l3 a').get_attribute('href')).query)['mode']==['walk']
+  assert page.locator('.place-card a[href*="uri.amap.com/navigation"], .restaurant-row a[href*="uri.amap.com/navigation"], #nearby a[href*="uri.amap.com/navigation"]').count()==0
+  assert page.locator('.place-card a[href*="uri.amap.com/marker"]').count()>0
+  assert page.locator('body').inner_text().find('从当前位置出发')==-1
   assert page.evaluate('window.mapChecks.interactive')
   assert page.locator('.map-canvas').evaluate('(e)=>getComputedStyle(e).touchAction')=='none'
   assert page.get_by_role('button',name='操作地图',exact=True).count()==0

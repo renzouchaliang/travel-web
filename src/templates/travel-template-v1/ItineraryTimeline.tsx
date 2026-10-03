@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import type { Day, RouteLeg, Trip } from "../../types/travel";
 import type { TripSelection } from "./useTripSelection";
+import { ExternalLinks, safeUrl } from "./ExternalLinks";
+import { routeNavigationUrl } from "../../maps/amap-links";
 import { PlaceCard } from "./PlaceCard";
 export const modeLabel = {
   walk: "步行",
@@ -24,6 +26,7 @@ export function TransitLegCard({
 }) {
   const name = (id: string) =>
     trip.places[day.stops.find((s) => s.id === id)!.placeId].name;
+  const navigationUrl = safeUrl(routeNavigationUrl(trip, day, leg));
   return (
     <article
       id={`leg-${leg.id}`}
@@ -47,7 +50,10 @@ export function TransitLegCard({
           {leg.plannedMinutes.source === "estimate" ? "估算" : "已核实"}）
         </p>
       )}
-      {leg.mapDisplay !== "text-only" && <button onClick={onSelect}>查看这一段</button>}
+      <div className="card-actions">
+        {leg.mapDisplay !== "text-only" && <button onClick={onSelect}>查看这一段</button>}
+        {navigationUrl && <ExternalLinks links={[{ id: `${leg.id}-navigation`, platform: "高德", action: "navigation", navigationIntent: "planned", targetType: "detail", label: "高德地图导航", url: navigationUrl }]} />}
+      </div>
     </article>
   );
 }

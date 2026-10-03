@@ -22,8 +22,10 @@ export function ExternalLinks({ links }: { links: ExternalLink[] }) {
         : l.targetType === "home"
           ? `${l.platform}首页`
           : l.action === "navigation" && l.navigationIntent === "planned"
-            ? `${l.platform} · 看计划路线`
-            : l.action === "navigation" &&
+            ? `${l.platform}地图导航`
+            : l.action === "location"
+              ? `${l.platform}地图打开`
+              : l.action === "navigation" &&
                 l.navigationIntent === "current-location"
               ? `${l.platform} · 从当前位置出发`
               : l.label.replace(/^(大众点评|携程|马蜂窝|美团)\s*[·・]\s*\1$/, "$1")}{" "}

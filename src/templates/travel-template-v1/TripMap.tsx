@@ -28,8 +28,7 @@ export function TripMap({
   current.current = { day, selection };
   const [status, setStatus] = useState("loading"),
     [attempt, setAttempt] = useState(0),
-    [routeAttempt, setRouteAttempt] = useState(0),
-    [collapsed, setCollapsed] = useState(false);
+    [routeAttempt, setRouteAttempt] = useState(0);
   const [results, setResults] = useState<Record<string, RouteResult>>({});
   const cache = useRef(
     new Map<string, { result: RouteResult; expires: number }>(),
@@ -241,15 +240,13 @@ export function TripMap({
       </p>
       <MapControls
         selection={selection}
-        collapsed={collapsed}
-        onCollapse={() => setCollapsed((v) => !v)}
       />
       <div className="route-chips" aria-label="地图路段选择">
         <button aria-pressed={!selectedLegId} onClick={selection.overview}>全天</button>
         {day.legs.filter((l) => l.mapDisplay !== "text-only").map((l) => <button key={l.id} aria-pressed={selectedLegId === l.id} onClick={() => selection.selectLeg(l.id)}>{mapLabel(trip.places[day.stops.find((s) => s.id === l.fromStopId)!.placeId])} → {mapLabel(trip.places[day.stops.find((s) => s.id === l.toStopId)!.placeId])}</button>)}
       </div>
       <div
-        className={`map-canvas-wrap ${collapsed && !mapExpanded ? "map-collapsed" : ""} ${mapInteractionEnabled || mapExpanded ? "interactive" : ""}`}
+        className={`map-canvas-wrap ${mapInteractionEnabled || mapExpanded ? "interactive" : ""}`}
       >
         <div
           ref={canvas}
@@ -264,9 +261,6 @@ export function TripMap({
           <MapStatus status={status} onRetry={() => setAttempt((v) => v + 1)} />
         )}
       </div>
-      {collapsed && !mapExpanded && (
-        <p>当天路线：{mainIds.map((id) => trip.places[id].name).join(" → ")}</p>
-      )}
       {visiblePlaces.some(
         (p) => p.coordinate && p.coordinate.crs !== "GCJ02",
       ) && (

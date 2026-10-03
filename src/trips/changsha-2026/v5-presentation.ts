@@ -16,8 +16,7 @@ export function applyV5Presentation(trip: Trip): Trip {
     { id: "hnu-stone", name: "湖南大学石碑", lng: 112.952741, lat: 28.17883, summary: "广场以东，需要额外步行，可按体力选择。" },
   ];
   for (const item of nearby) {
-    const query = new URLSearchParams({ to: `${item.lng},${item.lat},${item.name}`, mode: "walk", src: "travel_web", callnative: "1" });
-    trip.places[item.id] = { id: item.id, name: item.name, kind: "other", mapRole: "nearby", summary: item.summary, coordinate: { lng: item.lng, lat: item.lat, crs: "GCJ02" }, providerIds: { amapCity: "长沙市" }, photos: [], links: [{ id: `${item.id}-nav`, platform: "高德", action: "navigation", navigationIntent: "current-location", label: "高德导航", targetType: "detail", url: `https://uri.amap.com/navigation?${query}` }] };
+    trip.places[item.id] = { id: item.id, name: item.name, kind: "other", mapRole: "nearby", summary: item.summary, coordinate: { lng: item.lng, lat: item.lat, crs: "GCJ02" }, providerIds: { amapCity: "长沙市" }, photos: [], links: [] };
   }
   trip.days[0].nearbyPlaceIds = [...new Set([...trip.days[0].nearbyPlaceIds, ...nearby.map((p) => p.id)])];
   if (trip.places.square) trip.places.square.mapLabel = "湖大广场";
@@ -43,14 +42,13 @@ export function applyV5Presentation(trip: Trip): Trip {
       if (stop.id === "d1-arrival") stop.transport ??= { direction: "arrival", mode: "rail", destination: "长沙南站", arrivalTime: stop.startTime };
     }
   }
-  for (const day of trip.days) {
-    for (const stop of day.stops) {
-      const place = trip.places[stop.placeId];
-      if (place.coordinate?.crs === "GCJ02" && !place.links.some((l) => l.action === "navigation")) {
-        const query = new URLSearchParams({ to: `${place.coordinate.lng},${place.coordinate.lat},${place.name}`, mode: place.kind === "hotel" ? "car" : "walk", src: "travel_web", callnative: "1" });
-        place.links.push({ id: `${place.id}-navigation`, platform: "高德", action: "navigation", navigationIntent: "current-location", label: "导航过去", targetType: "detail", url: `https://uri.amap.com/navigation?${query}` });
-      }
-    }
+  for (const place of Object.values(trip.places)) {
+    const existing = place.links.find((l) => l.platform === "高德" && l.url.startsWith("https://www.amap.com/place/"));
+    place.links = place.links.filter((l) => l.platform !== "高德");
+    const coordinate = place.coordinate;
+    const query = coordinate?.crs === "GCJ02" ? new URLSearchParams({ position: `${coordinate.lng},${coordinate.lat}`, name: place.name, src: "travel_web", coordinate: "gaode", callnative: "1" }) : undefined;
+    const url = existing?.url ?? (query ? `https://uri.amap.com/marker?${query}` : undefined);
+    if (url) place.links.push({ id: `${place.id}-location`, platform: "高德", action: "location", label: "高德地图打开", targetType: "detail", url });
   }
   return trip;
 }

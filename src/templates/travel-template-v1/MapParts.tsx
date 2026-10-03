@@ -28,12 +28,8 @@ export function MapStatus({
 }
 export function MapControls({
   selection,
-  collapsed,
-  onCollapse,
 }: {
   selection: TripSelection;
-  collapsed: boolean;
-  onCollapse: () => void;
 }) {
   return (
     <div className="map-controls">
@@ -53,11 +49,7 @@ export function MapControls({
       <button className="map-expand-toggle" onClick={() => selection.setMapExpanded(!selection.mapExpanded)}>
         {selection.mapExpanded ? "关闭全屏地图" : "放大地图"}
       </button>
-      {!selection.mapExpanded && (
-        <button aria-expanded={!collapsed} onClick={onCollapse}>
-          {collapsed ? "展开地图" : "收起地图"}
-        </button>
-      )}
+
 
     </div>
   );

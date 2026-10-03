@@ -18,7 +18,7 @@ export interface ExternalLink {
   id: ID;
   platform: string; // 携程、马蜂窝、大众点评、官方等
   action:
-    "guide" | "reviews" | "official" | "booking" | "navigation" | "search";
+    "guide" | "reviews" | "official" | "booking" | "navigation" | "location" | "search";
   label: string;
   url: string;
   targetType: "detail" | "search" | "home";
@@ -103,6 +103,7 @@ export interface RouteLeg {
   fromStopId: ID;
   toStopId: ID;
   mode: TravelMode;
+  navigationUrl?: string; // Authored provider URL, including specialized taxi/rail entry points.
   viaPlaceIds?: ID[]; // 有序途经点，自驾等场景
   routePolicy?: string;
   summary: string; // 即使地图失败也可阅读
