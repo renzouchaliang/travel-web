@@ -6,9 +6,15 @@ import { TravelTemplateV1 } from "./templates/travel-template-v1/TravelTemplateV
 import { demoTrip, fixtureTrip } from "./trips/demo";
 import { defaultConfig } from "./templates/travel-template-v1/theme";
 
+import { resolvePublishedTrip } from "./trips";
+
 const params = new URLSearchParams(window.location.search);
-const template = params.get("template") === "travel-template-v1";
-const trip = params.get("fixture") === "multi-day" ? fixtureTrip : demoTrip;
+const publishedTrip = resolvePublishedTrip(window.location.pathname, params);
+const template =
+  !!publishedTrip || params.get("template") === "travel-template-v1";
+const trip =
+  publishedTrip ??
+  (params.get("fixture") === "multi-day" ? fixtureTrip : demoTrip);
 const config = {
   ...defaultConfig,
   desktopLayout:
