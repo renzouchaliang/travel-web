@@ -13,12 +13,13 @@ export function ExternalLinks({ links, maxVisible = 3, platformLabels = false }:
   const render = (l: ExternalLink) => (
     <a
       key={l.id}
+      className={l.action === "location" ? "compact-map-button location-link" : undefined}
       href={safeUrl(l.url)}
       target="_blank"
       rel="noopener noreferrer"
     >
       {l.action === "location"
-        ? <><span aria-hidden="true">📍</span> 地图打开</>
+        ? <>地图打开 <span className="location-pin" aria-hidden="true">📍</span></>
         : platformLabels && l.targetType === "detail"
           ? l.platform
           : l.targetType === "search"
@@ -31,7 +32,7 @@ export function ExternalLinks({ links, maxVisible = 3, platformLabels = false }:
                 l.navigationIntent === "current-location"
               ? `${l.platform} · 从当前位置出发`
               : l.label.replace(/^(大众点评|携程|马蜂窝|美团)\s*[·・]\s*\1$/, "$1")}{" "}
-      ↗
+      {l.action !== "location" && "↗"}
     </a>
   );
   return (

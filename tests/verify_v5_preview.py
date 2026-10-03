@@ -27,12 +27,25 @@ with sync_playwright() as p:
   assert page.get_by_role('link',name='在美团搜索').count()==4
   assert page.locator('#stop-d1-academy .ticket-actions').count()==0
   header_colors=[]
+  header_heights=[]
   for tab in page.locator('.day-tabs [role=tab]').all():
    tab.click()
    accent=tab.evaluate('(e)=>getComputedStyle(e).getPropertyValue("--day-tab-color").trim()')
    header_colors.append(page.locator('.trip-header').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
+   header_heights.append(page.locator('.trip-header').bounding_box()['height'])
    assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundColor')==tab.evaluate('(e)=>{const d=document.createElement("div");d.style.color=getComputedStyle(e).getPropertyValue("--day-tab-color");return d.style.color}')
   assert len(set(header_colors))==4
+  assert len(set(header_heights))==1
+  assert header_heights[0]==(192 if width<768 else 208 if width<1024 else 224)
+  assert page.locator('.map-heading h2, .map-sequence-note').count()==0
+  location_link=page.locator('a.location-link').first
+  assert ' '.join(location_link.inner_text().split())=='地图打开 📍'
+  assert location_link.evaluate('(e)=>getComputedStyle(e).borderStyle')=='solid'
+  assert location_link.bounding_box()['height']==page.locator('.place-card button.compact-map-button').first.bounding_box()['height']
+  if width<768:
+   assert page.locator('.mobile-quick-nav button').first.bounding_box()['height']==36
+   assert page.locator('.mobile-quick-nav button').first.evaluate('(e)=>getComputedStyle(e).borderRadius')=='0px'
+  assert page.locator('#nearby .nearby-photo').count()==0
   page.locator('.day-tabs [role=tab]').first.click()
   assert page.get_by_role('button',name='展开地图',exact=True).count()==0
   assert page.get_by_role('button',name='收起地图',exact=True).count()==0
@@ -80,7 +93,7 @@ with sync_playwright() as p:
   page.locator('.dining-tabs [role=tab]').nth(1).click()
   assert page.locator('.restaurant-group').count()==1
   assert page.locator('.restaurant-group .restaurant-row').count()==4
-  page.locator('#stop-d1-academy .compact-map-button').click()
+  page.locator('#stop-d1-academy button.compact-map-button').click()
   assert page.locator('.travel-map-pin.active').count()==1
   assert page.evaluate('window.mapChecks.popups')==0
   assert page.locator('.place-preview').count()==0
@@ -90,7 +103,7 @@ with sync_playwright() as p:
   page.get_by_role('button',name='缩小一级',exact=True).click()
   assert page.evaluate('window.mapChecks.zoom')==before_zoom
   page.locator('.dining-tabs [role=tab]').nth(2).click()
-  page.locator('.restaurant-group .compact-map-button').first.click()
+  page.locator('.restaurant-group button.compact-map-button').first.click()
   assert page.evaluate('window.mapChecks.zoom')==16
   assert page.locator('.travel-map-dining.active .travel-map-label').is_visible()
   assert page.evaluate('window.mapChecks.popups')==0
@@ -117,16 +130,30 @@ with sync_playwright() as p:
   page.get_by_role('button',name='总览',exact=True).click()
   assert not page.locator('.travel-map-pin.active').count()
   if width==1440:
+   page.route('**/__test_nearby.svg',lambda r:r.fulfill(status=200,content_type='image/svg+xml',body='<svg xmlns="http://www.w3.org/2000/svg" width="112" height="84"><rect width="112" height="84" fill="green"/></svg>'))
    page.evaluate("""async () => {
      const moduleUrl=performance.getEntriesByType('resource').find((e)=>e.name.includes('/changsha-2026/adapter.ts')).name;
      const {changshaTrip}=await import(moduleUrl);
-     changshaTrip.days[0].visual={themeColor:'#ddbb66',headerImage:{src:'https://example.org/test-header.jpg',alt:'测试代表性图片'}};
+     changshaTrip.days[0].visual={themeColor:'#ddbb66',headerImage:{src:'https://example.org/test-header.jpg',alt:'测试代表性图片',focalPoint:{x:35,y:60}}};
+     changshaTrip.places.zibei.photos=[{id:'nearby-test',src:'/__test_nearby.svg',alt:'周边代表图测试',rights:'owned'}];
      for(const platform of ['美团','飞猪','携程']) changshaTrip.places.academy.links.push({id:'test-'+platform,platform,action:'booking',targetType:'detail',label:'买票',url:'https://example.org/ticket/'+encodeURIComponent(platform)});
    }""")
    page.locator('.day-tabs [role=tab]').nth(1).click()
    page.locator('.day-tabs [role=tab]').first.click()
    assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundColor')=='rgb(221, 187, 102)'
    assert 'test-header.jpg' in page.locator('.trip-header').evaluate('(e)=>e.style.backgroundImage')
+   assert page.locator('.trip-header').bounding_box()['height']==224
+   assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundPosition')=='35% 60%'
+   row=page.locator('#nearby .nearby-row').nth(1)
+   if row.get_attribute('open') is None:row.locator('summary').click()
+   photo=row.locator('.nearby-photo')
+   photo.scroll_into_view_if_needed()
+   page.wait_for_function('document.querySelector(".nearby-photo").naturalWidth>0')
+   assert photo.bounding_box()['width']==112 and photo.bounding_box()['height']==84
+   assert photo.bounding_box()['x']>row.locator('.nearby-detail > div').bounding_box()['x']
+   photo.dispatch_event('error')
+   assert row.locator('.nearby-photo').count()==0
+   assert row.locator('.nearby-detail').evaluate('(e)=>getComputedStyle(e).display')=='block'
    assert page.locator('#stop-d1-academy .ticket-actions a').count()==3
    assert [a.inner_text().strip() for a in page.locator('#stop-d1-academy .ticket-actions a').all()]==['美团 ↗','飞猪 ↗','携程 ↗']
    assert page.locator('#stop-d1-academy .place-media a[href*="example.org/ticket"]').count()==0

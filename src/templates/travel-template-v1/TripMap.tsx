@@ -234,10 +234,7 @@ export function TripMap({
       aria-modal={mapExpanded ? true : undefined}
       aria-label="当天地图"
     >
-      <div className="map-heading"><h2>今天去哪里</h2>{mapExpanded && <button className="map-exit" onClick={close}>退出全屏 ✕</button>}</div>
-      <p className="map-sequence-note">
-        点路段查看交通路线，点“总览”恢复。自由逛吃只标地点。
-      </p>
+      {mapExpanded && <div className="map-heading"><button className="map-exit" onClick={close}>退出全屏 ✕</button></div>}
       <MapControls
         selection={selection}
       />

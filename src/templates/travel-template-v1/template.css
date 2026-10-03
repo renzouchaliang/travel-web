@@ -613,3 +613,25 @@ body:has(.travel-template) {
 .travel-template .map-equivalent button { min-height:28px; padding:4px 7px; margin:3px 0; font-size:12px; line-height:1.4; }
 
 .trip-header .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+
+/* Fixed device heights: date changes and absent photos never resize the header. */
+.travel-template .trip-header { height:192px; flex:none; display:flex; flex-direction:column; justify-content:center; gap:8px; padding:20px 24px; overflow:hidden; }
+.trip-header h1, .trip-header p { margin:0; }
+.trip-header h1, .trip-header .main-route { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.trip-header .main-route { line-height:1.45; }
+@media (min-width:768px) { .travel-template .trip-header { height:208px; } }
+@media (min-width:1024px) { .travel-template .trip-header { height:224px; padding:24px 30px; } }
+.travel-template .mobile-quick-nav { gap:0; padding:3px 8px calc(3px + env(safe-area-inset-bottom)); box-shadow:none; }
+.travel-template .mobile-quick-nav button { min-height:36px; padding:4px 6px; font-size:12px; line-height:1.3; border:0; border-radius:0; background:transparent; }
+.travel-template a.location-link { display:inline-flex; align-items:center; justify-content:center; gap:3px; background:var(--travel-card); border:1px solid var(--travel-border); border-radius:9px; text-decoration:none; }
+.location-pin { font-size:11px; line-height:1; }
+.travel-template .map-panel.map-expanded { grid-template-rows:auto auto auto minmax(0,1fr); }
+.map-heading { justify-content:flex-end; }
+.nearby-detail { display:block; }
+.nearby-detail:has(.nearby-photo) { display:grid; grid-template-columns:minmax(0,1fr) 112px; align-items:start; gap:12px; }
+.nearby-photo { width:112px; height:84px; object-fit:cover; border-radius:8px; margin-top:8px; }
+@media (orientation:landscape) and (max-height:550px) { .travel-template .map-panel.map-expanded { grid-template-rows:auto auto minmax(0,1fr); } .map-expanded .map-controls { left:12px; } }
+
+.nearby-detail .nearby-fact { font-size:12px; margin:5px 0; }
+
+@media (max-width:767px) { .travel-template { padding-bottom:calc(58px + env(safe-area-inset-bottom)); } }

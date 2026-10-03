@@ -6,6 +6,7 @@ import { DayTabs } from "./DayTabs";
 import { useTripSelection } from "./useTripSelection";
 import { TripMap, type AdapterFactory } from "./TripMap";
 import { ItineraryTimeline } from "./ItineraryTimeline";
+import { NearbyPhoto } from "./NearbyPhoto";
 import { RestaurantList } from "./RestaurantList";
 import { dayAppearance } from "./dayAppearance";
 import { ExternalLinks, safeUrl } from "./ExternalLinks";
@@ -39,8 +40,11 @@ const unavailableMap: AdapterFactory = () => ({
 export function TripHeader({ trip, day }: { trip: Trip; day: Day }) {
   const appearance = dayAppearance(day, trip.days.findIndex((d) => d.id === day.id));
   const image = safeUrl(day.visual?.headerImage?.src);
+  const focalPoint = day.visual?.headerImage?.focalPoint;
+  const validFocus = focalPoint && [focalPoint.x, focalPoint.y].every((v) => Number.isFinite(v) && v >= 0 && v <= 100);
+  const backgroundPosition = validFocus ? `${focalPoint.x}% ${focalPoint.y}%` : "center";
   return (
-    <header className="trip-header" style={{ backgroundColor: appearance.accent, color: image ? "#fff" : appearance.foreground, backgroundImage: image ? `linear-gradient(#0008, #0008), url(${JSON.stringify(image)})` : undefined }}>
+    <header className="trip-header" style={{ backgroundColor: appearance.accent, color: image ? "#fff" : appearance.foreground, backgroundPosition, backgroundImage: image ? `linear-gradient(#0008, #0008), url(${JSON.stringify(image)})` : undefined }}>
       {image && <span className="sr-only">{day.visual?.headerImage?.alt}</span>}
       <h1>{trip.title}</h1>
       <p>
@@ -80,7 +84,7 @@ export function NearbyPlaces({ trip, onMap }: { trip: Trip; onMap: (id: string) 
   if (!ids.length) return null;
   return <section id="nearby" className="nearby-list"><h2>周边还有什么有趣的</h2><p>未列入固定行程，按兴趣和体力选择。</p>{ids.map((id) => {
     const place = trip.places[id];
-    return <details className="nearby-row" key={id}><summary>{place.name}</summary><p>{place.summary}</p>{place.address && <p>{place.address}</p>}<div className="card-actions"><button className="compact-map-button" onClick={() => onMap(id)}>在地图看</button><ExternalLinks links={place.links} /></div></details>;
+    return <details className="nearby-row" key={id}><summary>{place.name}</summary><div className="nearby-detail"><div><p>{place.summary}</p>{place.address && <p>{place.address}</p>}{([ ["开放", place.opening], ["门票", place.ticket], ["预约", place.booking] ] as const).map(([label, fact]) => fact && <p className="nearby-fact" key={label}>{label}：{fact.text}</p>)}</div><NearbyPhoto photos={place.photos} /></div><div className="card-actions"><button className="compact-map-button" onClick={() => onMap(id)}>在地图看</button><ExternalLinks links={place.links} /></div></details>;
   })}</section>;
 }
 export function MobileQuickNav({
