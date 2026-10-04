@@ -24,7 +24,22 @@ with sync_playwright() as p:
   boxes=[button.bounding_box() for button in page.locator('.map-controls button').all()]
   assert len(set(round(box['y']) for box in boxes))==1
   assert page.locator('.map-equivalent').get_attribute('open') is None
-  assert page.get_by_role('link',name='在美团搜索').count()==4
+  assert page.locator('.nearby-pin').count()==0
+  page.locator('.route-chips button').nth(1).click()
+  assert page.locator('.nearby-pin').count()==0
+  page.get_by_role('button',name='探索',exact=True).click()
+  assert page.locator('.nearby-pin').count()==3
+  page.locator('.map-equivalent summary').click()
+  page.locator('.map-equivalent button').filter(has_text='自卑亭').click()
+  page.get_by_role('button',name='探索',exact=True).click()
+  assert page.locator('.nearby-pin').count()==0
+  assert page.get_by_role('button',name='探索',exact=True).get_attribute('aria-pressed')=='false'
+  page.get_by_role('button',name='探索',exact=True).click()
+  page.locator('.day-tabs [role=tab]').nth(1).click()
+  page.locator('.day-tabs [role=tab]').first.click()
+  assert page.get_by_role('button',name='探索',exact=True).get_attribute('aria-pressed')=='false'
+  assert page.locator('.nearby-pin').count()==0
+  assert page.get_by_role('link',name='美团 ↗').count()==4
   assert page.locator('#stop-d1-academy .ticket-actions').count()==0
   header_colors=[]
   header_heights=[]
@@ -39,7 +54,7 @@ with sync_playwright() as p:
   assert header_heights[0]==(192 if width<768 else 208 if width<1024 else 224)
   assert page.locator('.map-heading h2, .map-sequence-note').count()==0
   location_link=page.locator('a.location-link').first
-  assert ' '.join(location_link.inner_text().split())=='地图打开 📍'
+  assert ' '.join(location_link.inner_text().split())=='地图APP打开 📍'
   assert location_link.evaluate('(e)=>getComputedStyle(e).borderStyle')=='solid'
   assert location_link.bounding_box()['height']==page.locator('.place-card button.compact-map-button').first.bounding_box()['height']
   if width<768:
@@ -82,6 +97,7 @@ with sync_playwright() as p:
   for forbidden in ['资料来源','图源：','核查时间','评分暂无','未确认','estimate']:assert forbidden not in text,forbidden
   assert page.locator('.route-chips').inner_text().find('希尔顿') == -1
   assert page.locator('.travel-map-label').filter(has_text='酒店').count()==1
+  page.evaluate('window.mapChecks.zoom=12;window.mapChecks.events.zoomend()')
   page.get_by_role('button',name='餐饮点',exact=True).click()
   page.locator('.travel-map-dining').first.wait_for(state='attached')
   assert page.locator('.travel-map-dining:visible').count()==4
@@ -103,6 +119,8 @@ with sync_playwright() as p:
   page.get_by_role('button',name='缩小一级',exact=True).click()
   assert page.evaluate('window.mapChecks.zoom')==before_zoom
   page.locator('.dining-tabs [role=tab]').nth(2).click()
+  actions=page.locator('.restaurant-group .restaurant-row').first.locator('.card-actions')
+  assert [' '.join(e.inner_text().split()) for e in actions.locator('a, button').all()]==['大众点评 ↗','美团 ↗','地图APP打开 📍','在地图看']
   page.locator('.restaurant-group button.compact-map-button').first.click()
   assert page.evaluate('window.mapChecks.zoom')==16
   assert page.locator('.travel-map-dining.active .travel-map-label').is_visible()

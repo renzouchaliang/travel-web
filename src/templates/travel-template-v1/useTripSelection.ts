@@ -35,6 +35,7 @@ export function useTripSelection(initialDayId: string) {
     setMapInteractionEnabled,
     switchDay: (id: string) => {
       setActiveDayId(id);
+      setLayers({ restaurants: false, nearby: false });
       setStop(undefined);
       setPlace(undefined);
       setLeg(undefined);
@@ -68,8 +69,13 @@ export function useTripSelection(initialDayId: string) {
       intent("day");
     },
     userDrag: () => intent("user"),
-    toggleLayer: (layer: "restaurants" | "nearby") =>
-      setLayers((v) => ({ ...v, [layer]: !v[layer] })),
+    toggleLayer: (layer: "restaurants" | "nearby") => {
+      if (layer === "nearby" && visibleLayers.nearby) {
+        setPlace(undefined);
+        setStop(undefined);
+      }
+      setLayers((v) => ({ ...v, [layer]: !v[layer] }));
+    },
   };
 }
 export type TripSelection = ReturnType<typeof useTripSelection>;

@@ -174,6 +174,11 @@ export function TripMap({
     ...(visibleLayers.nearby ? day.nearbyPlaceIds : []),
     ...(selectedPlaceId ? [selectedPlaceId] : []),
   ]);
+  // Routing endpoints may also be optional exploration places. Computing their
+  // route must not bypass the layer switch, nor should a stale selected marker.
+  for (const id of visibleIds) {
+    if (!visibleLayers.nearby && day.nearbyPlaceIds.includes(id) && !mainIds.includes(id)) visibleIds.delete(id);
+  }
   const visiblePlaces = [...visibleIds].map((id) => trip.places[id]);
   const visibleKey = [...visibleIds].join("|");
   const scene = dayMapScene(trip, day, selectedLegId);

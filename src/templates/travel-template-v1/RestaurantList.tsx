@@ -46,6 +46,8 @@ export function RestaurantRow({
     label: "美团搜索", targetType: "search" as const,
     url: `https://www.meituan.com/s/${encodeURIComponent([p.providerIds?.amapCity, p.name, p.branchName].filter(Boolean).join(" "))}/`,
   }];
+  const priority = (link: typeof restaurantLinks[number]) => link.platform === "大众点评" ? 0 : link.platform === "美团" ? 1 : link.action === "location" ? 2 : 3;
+  const orderedLinks = [...restaurantLinks].sort((a, b) => priority(a) - priority(b));
   const title = <>{p.name}{p.branchName && ` · ${p.branchName}`}</>;
   return (
     <article className="restaurant-row">
@@ -55,7 +57,7 @@ export function RestaurantRow({
       </p>
       {d && <p>{d.kind === "straight" ? "直线约" : d.kind === "walking" ? "步行约" : "驾车约"}{d.meters < 1000 ? `${Math.round(d.meters)}米` : `${(d.meters / 1000).toFixed(1)}公里`}</p>}
       {p.rating && <p>{p.rating.platform} {p.rating.value}/{p.rating.scale}</p>}
-      <div className="card-actions"><ExternalLinks links={restaurantLinks} maxVisible={4} />{p.coordinate && <button className="compact-map-button" onClick={onMap}>在地图看</button>}</div>
+      <div className="card-actions"><ExternalLinks links={orderedLinks} maxVisible={4} platformLabels />{p.coordinate && <button className="compact-map-button" onClick={onMap}>在地图看</button>}</div>
 
     </article>
   );

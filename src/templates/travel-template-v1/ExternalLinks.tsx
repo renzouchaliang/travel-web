@@ -14,13 +14,14 @@ export function ExternalLinks({ links, maxVisible = 3, platformLabels = false }:
     <a
       key={l.id}
       className={l.action === "location" ? "compact-map-button location-link" : undefined}
+      title={l.targetType === "search" ? `在${l.platform}搜索` : undefined}
       href={safeUrl(l.url)}
       target="_blank"
       rel="noopener noreferrer"
     >
       {l.action === "location"
-        ? <>地图打开 <span className="location-pin" aria-hidden="true">📍</span></>
-        : platformLabels && l.targetType === "detail"
+        ? <>地图APP打开 <span className="location-pin" aria-hidden="true">📍</span></>
+        : platformLabels
           ? l.platform
           : l.targetType === "search"
         ? `在${l.platform}搜索`
