@@ -52,7 +52,10 @@ with sync_playwright() as p:
    header_texts.append(page.locator('.trip-header').inner_text())
    assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundColor')==tab.evaluate('(e)=>{const d=document.createElement("div");d.style.color=getComputedStyle(e).getPropertyValue("--day-tab-color");return d.style.color}')
   assert len(set(header_texts))==1
-  assert '4 天 · 2026年10月2日—10月5日' in header_texts[0]
+  assert page.locator('.trip-poem').inner_text()==''
+  header_top=page.locator('.trip-header').bounding_box()['y']
+  assert page.locator('.trip-header h1').bounding_box()['y']-header_top<=24
+  assert '四天 · 2026年10月2日—10月5日' in header_texts[0]
   assert '希尔顿' not in header_texts[0] and '长沙南站' not in header_texts[0]
   assert len(set(header_colors))==4
   assert len(set(header_heights))==1
@@ -170,7 +173,8 @@ with sync_playwright() as p:
    page.evaluate("""async () => {
      const moduleUrl=performance.getEntriesByType('resource').find((e)=>e.name.includes('/changsha-2026/adapter.ts')).name;
      const {changshaTrip}=await import(moduleUrl);
-     changshaTrip.days[0].visual={themeColor:'#ddbb66',headerImage:{src:'https://example.org/test-header.jpg',alt:'测试代表性图片',focalPoint:{x:35,y:60}}};
+     changshaTrip.days[0].visual={poem:{lines:['测试第一天诗句一','测试第一天诗句二']},themeColor:'#ddbb66',headerImage:{src:'https://example.org/test-header.jpg',alt:'测试代表性图片',focalPoint:{x:35,y:60}}};
+     changshaTrip.days[1].visual={poem:{lines:['测试第二天诗句']}};
      changshaTrip.places.zibei.photos=[{id:'nearby-test',src:'/__test_nearby.svg',alt:'周边代表图测试',rights:'owned'}];
      for(const platform of ['美团','飞猪','携程']) changshaTrip.places.academy.links.push({id:'test-'+platform,platform,action:'booking',targetType:'detail',label:'买票',url:'https://example.org/ticket/'+encodeURIComponent(platform)});
    }""")
@@ -180,6 +184,7 @@ with sync_playwright() as p:
    assert 'test-header.jpg' in page.locator('.trip-header').evaluate('(e)=>e.style.backgroundImage')
    assert page.locator('.trip-header').bounding_box()['height']==224
    assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundPosition')=='35% 60%'
+   assert page.locator('.trip-poem p').all_inner_texts()==['测试第一天诗句一','测试第一天诗句二']
    row=page.locator('#nearby .nearby-row').nth(1)
    if row.get_attribute('open') is None:row.locator('summary').click()
    photo=row.locator('.nearby-photo')
@@ -195,6 +200,11 @@ with sync_playwright() as p:
    assert page.locator('#stop-d1-academy .place-media a[href*="example.org/ticket"]').count()==0
    page.locator('.day-tabs [role=tab]').nth(1).click()
    assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundImage')==''
+   assert page.locator('.trip-poem').inner_text()=='测试第二天诗句'
+   assert page.locator('.trip-header').bounding_box()['height']==224
+   page.locator('.day-tabs [role=tab]').nth(2).click()
+   assert page.locator('.trip-poem').inner_text()==''
+   assert page.locator('.trip-header').bounding_box()['height']==224
   assert not errors,errors
   print('PASS',width,'four days, blank date, V5 media, dining, modal, real route calls, station excluded')
   page.close()

@@ -141,7 +141,7 @@ export interface RestaurantGroup {
   selectionCriteria?: { radiusMeters: number; minCandidates: number; platform: string; minRating?: number; ratingScale?: number; popularityAlternative?: boolean };
 }
 export interface Day {
-  visual?: { themeColor?: string; headerImage?: { src: string; alt: string; focalPoint?: { x: number; y: number } } };
+  visual?: { poem?: { lines: string[] }; themeColor?: string; headerImage?: { src: string; alt: string; focalPoint?: { x: number; y: number } } };
   id: ID;
   date?: string;
   title: string;

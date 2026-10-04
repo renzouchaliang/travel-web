@@ -37,6 +37,12 @@ const unavailableMap: AdapterFactory = () => ({
   }),
   destroy: () => {},
 });
+function chineseDayCount(count: number): string {
+  const digits = "零一二三四五六七八九";
+  if (count < 10) return digits[count];
+  if (count < 100) return `${count < 20 ? "" : digits[Math.floor(count / 10)]}十${count % 10 ? digits[count % 10] : ""}`;
+  return String(count);
+}
 export function TripHeader({ trip, day }: { trip: Trip; day: Day }) {
   const appearance = dayAppearance(day, trip.days.findIndex((d) => d.id === day.id));
   const image = safeUrl(day.visual?.headerImage?.src);
@@ -54,7 +60,10 @@ export function TripHeader({ trip, day }: { trip: Trip; day: Day }) {
     <header className="trip-header" style={{ backgroundColor: appearance.accent, color: image ? "#fff" : appearance.foreground, backgroundPosition, backgroundImage: image ? `linear-gradient(#0008, #0008), url(${JSON.stringify(image)})` : undefined }}>
       {image && <span className="sr-only">{day.visual?.headerImage?.alt}</span>}
       <h1>{trip.title}</h1>
-      <p>{trip.days.length} 天{dateRange && ` · ${dateRange}`}</p>
+      <p>{chineseDayCount(trip.days.length)}天{dateRange && ` · ${dateRange}`}</p>
+      <div className="trip-poem" aria-label={day.visual?.poem?.lines.some((line) => line.trim()) ? "当日题诗" : undefined}>
+        {day.visual?.poem?.lines.filter((line) => line.trim()).map((line, i) => <p key={i}>{line}</p>)}
+      </div>
     </header>
   );
 }
