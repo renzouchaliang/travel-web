@@ -41,6 +41,7 @@ with sync_playwright() as p:
   assert page.locator('.nearby-pin').count()==0
   assert page.get_by_role('link',name='美团 ↗').count()==4
   assert page.locator('#stop-d1-academy .ticket-actions').count()==0
+  header_texts=[]
   header_colors=[]
   header_heights=[]
   for tab in page.locator('.day-tabs [role=tab]').all():
@@ -48,7 +49,11 @@ with sync_playwright() as p:
    accent=tab.evaluate('(e)=>getComputedStyle(e).getPropertyValue("--day-tab-color").trim()')
    header_colors.append(page.locator('.trip-header').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
    header_heights.append(page.locator('.trip-header').bounding_box()['height'])
+   header_texts.append(page.locator('.trip-header').inner_text())
    assert page.locator('.trip-header').evaluate('(e)=>e.style.backgroundColor')==tab.evaluate('(e)=>{const d=document.createElement("div");d.style.color=getComputedStyle(e).getPropertyValue("--day-tab-color");return d.style.color}')
+  assert len(set(header_texts))==1
+  assert '4 天 · 2026年10月2日—10月5日' in header_texts[0]
+  assert '希尔顿' not in header_texts[0] and '长沙南站' not in header_texts[0]
   assert len(set(header_colors))==4
   assert len(set(header_heights))==1
   assert header_heights[0]==(192 if width<768 else 208 if width<1024 else 224)
@@ -76,6 +81,10 @@ with sync_playwright() as p:
   assert page.locator('.place-card a[href*="uri.amap.com/navigation"], .restaurant-row a[href*="uri.amap.com/navigation"], #nearby a[href*="uri.amap.com/navigation"]').count()==0
   assert page.locator('.place-card a[href*="uri.amap.com/marker"]').count()>0
   assert page.locator('body').inner_text().find('从当前位置出发')==-1
+  assert page.locator('.day-summary .day-route').is_visible()
+  assert '长沙南站' in page.locator('.day-summary .day-route').inner_text()
+  assert '按所在位置选一家' not in page.locator('#dining').inner_text()
+  if width<768:assert page.locator('.mobile-quick-nav button').first.evaluate('(e)=>getComputedStyle(e).fontSize')=='14px'
   assert page.evaluate('window.mapChecks.interactive')
   assert page.locator('.map-canvas').evaluate('(e)=>getComputedStyle(e).touchAction')=='none'
   assert page.get_by_role('button',name='操作地图',exact=True).count()==0

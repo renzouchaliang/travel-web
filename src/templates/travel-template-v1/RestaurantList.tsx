@@ -74,7 +74,7 @@ export function RestaurantList({
   const [activeGroups, setActiveGroups] = useState<Record<string, string>>({});
   const active = day.restaurantGroups.find((g) => g.id === activeGroups[day.id]) ?? day.restaurantGroups[0];
   const choose = (id: string) => setActiveGroups((v) => ({ ...v, [day.id]: id }));
-  return <section id="dining"><h2>沿途吃什么</h2><p>按所在位置选一家，点评看门店，地图看位置。</p>
+  return <section id="dining"><h2>沿途吃什么</h2>
     <div className="dining-tabs" role="tablist" aria-label="附近餐饮区域">{day.restaurantGroups.map((g, i) => <button key={g.id} id={`dining-tab-${day.id}-${g.id}`} role="tab" aria-selected={active?.id === g.id} aria-controls={`dining-panel-${day.id}`} tabIndex={active?.id === g.id ? 0 : -1} onClick={() => choose(g.id)} onKeyDown={(e) => {
       let next = i;
       if (e.key === "ArrowRight") next = (i + 1) % day.restaurantGroups.length;

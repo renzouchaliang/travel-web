@@ -43,33 +43,27 @@ export function TripHeader({ trip, day }: { trip: Trip; day: Day }) {
   const focalPoint = day.visual?.headerImage?.focalPoint;
   const validFocus = focalPoint && [focalPoint.x, focalPoint.y].every((v) => Number.isFinite(v) && v >= 0 && v <= 100);
   const backgroundPosition = validFocus ? `${focalPoint.x}% ${focalPoint.y}%` : "center";
+  const dates = trip.days.flatMap((d) => d.date ? [d.date] : []).sort();
+  const start = dates[0], end = dates.at(-1);
+  const formatDate = (date: string, year = true) => {
+    const [y, m, d] = date.split("-").map(Number);
+    return `${year ? `${y}年` : ""}${m}月${d}日`;
+  };
+  const dateRange = start ? `${formatDate(start)}${end && end !== start ? `—${formatDate(end, start.slice(0, 4) !== end.slice(0, 4))}` : ""}` : undefined;
   return (
     <header className="trip-header" style={{ backgroundColor: appearance.accent, color: image ? "#fff" : appearance.foreground, backgroundPosition, backgroundImage: image ? `linear-gradient(#0008, #0008), url(${JSON.stringify(image)})` : undefined }}>
       {image && <span className="sr-only">{day.visual?.headerImage?.alt}</span>}
       <h1>{trip.title}</h1>
-      <p>
-        {trip.days.length} 天
-        {day.date && ` · ${day.date}`}
-      </p>
-      <p className="main-route">
-        {day.stops
-          .filter((s) => s.role !== "optional")
-          .map((s) => trip.places[s.placeId].name)
-          .join(" → ")}
-      </p>
+      <p>{trip.days.length} 天{dateRange && ` · ${dateRange}`}</p>
     </header>
   );
 }
 export function DaySummary({ trip, day }: { trip: Trip; day: Day }) {
+  const route = day.stops.filter((s) => s.role !== "optional").map((s) => trip.places[s.placeId].name).join(" → ");
   return (
     <section className="travel-card day-summary">
       <h2>{day.title}</h2>
-      <p>
-        {day.stops
-          .filter((s) => s.role !== "optional")
-          .map((s) => trip.places[s.placeId].name)
-          .join(" → ")}
-      </p>
+      {route && <p className="day-route">{route}</p>}
       <p>{day.directionSummary}</p>
       {day.alerts.map((a, i) => (
         <p className="alert" key={i}>
