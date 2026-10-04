@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Day, RestaurantGroup, Trip } from "../../types/travel";
+import { mapLabel } from "../../maps/labels";
 import { ExternalLinks } from "./ExternalLinks";
 export function sortedCandidates(
   group: RestaurantGroup,
@@ -48,7 +49,7 @@ export function RestaurantRow({
   }];
   const priority = (link: typeof restaurantLinks[number]) => link.platform === "大众点评" ? 0 : link.platform === "美团" ? 1 : link.action === "location" ? 2 : 3;
   const orderedLinks = [...restaurantLinks].sort((a, b) => priority(a) - priority(b));
-  const title = <>{p.name}{p.branchName && ` · ${p.branchName}`}</>;
+  const title = mapLabel(p);
   return (
     <article className="restaurant-row">
       <h4>{title}</h4>

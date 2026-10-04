@@ -45,7 +45,7 @@ export type ChangshaExport = Omit<RawExport, "trip"> & {
   trip: Omit<RawExport["trip"], "days"> & { days: ExportDay[] };
 };
 type DiningGroup = NonNullable<ExportDay["dining"]>[number];
-type Restaurant = DiningGroup["restaurants"][number];
+type Restaurant = DiningGroup["restaurants"][number] & { mapLabel?: string };
 type Guide = { title: string; provider: string; url: string; type: string };
 type LinkOwner = {
   officialUrl: string | null;
@@ -182,6 +182,7 @@ export function adaptChangsha(input: ChangshaExport): Trip {
     places[id] = {
       id,
       name: item.name,
+      mapLabel: item.mapLabel,
       kind: "restaurant",
       areaId: group.area,
       address: item.address ?? undefined,

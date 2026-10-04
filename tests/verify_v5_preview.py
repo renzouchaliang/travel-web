@@ -101,6 +101,11 @@ with sync_playwright() as p:
   assert page.locator('.restaurant-row h4 button, .restaurant-row h4 a').count()==0
   assert '大众点评 · 大众点评' not in page.locator('.restaurant-group').inner_text()
   assert page.locator('.place-media img').count()==2
+  for tab in page.locator('.dining-tabs [role=tab]').all():
+   tab.click()
+   for name in page.locator('.restaurant-row h4').all_inner_texts():
+    assert all(c not in name for c in ['（','）','(',')',' · ']),name
+  page.locator('.dining-tabs [role=tab]').first.click()
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
   checks=page.evaluate('window.mapChecks')
   assert all(q[0][0]!=113.06551 and q[1][0]!=113.06551 for q in checks['queries'])
