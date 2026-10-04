@@ -1,0 +1,113 @@
+{
+  "templateVersion": "travel-template-v1-r13",
+  "frozenCommit": "b12af99a2bb6b84ca7cbc2296a838d27735a36d5",
+  "reviewDate": "2026-10-04",
+  "status": "review-draft",
+  "dataSchema": "travel-handoff.schema.json",
+  "manual": "交接手册.md",
+  "layout": "stacked",
+  "header": {
+    "heightsPx": {
+      "mobile": 192,
+      "tablet": 208,
+      "desktop": 224
+    },
+    "breakpointsPx": [
+      768,
+      1024
+    ],
+    "fields": [
+      "trip.title",
+      "trip.days.length (中文天数)",
+      "trip.days.date (整趟起止日期)",
+      "day.visual.poem.lines"
+    ],
+    "imageFit": "cover",
+    "defaultFocus": [
+      50,
+      50
+    ],
+    "noImage": "每日纯色",
+    "noPoem": "留空",
+    "palette": [
+      "#124448",
+      "#665080",
+      "#805326",
+      "#345d8b"
+    ]
+  },
+  "map": {
+    "controls": [
+      "总览",
+      "餐饮点",
+      "探索",
+      "全屏"
+    ],
+    "fullscreenControls": [
+      "总览",
+      "餐饮点",
+      "探索",
+      "退出全屏"
+    ],
+    "interactiveByDefault": true,
+    "textListDefault": "collapsed",
+    "coordinateSystem": "GCJ02",
+    "longTransfers": "text-only;excluded-from-overview",
+    "exploration": "explicit layer only; reset on date change",
+    "routeGeometry": "AMap returned routes only; no straight-line fallback"
+  },
+  "dining": {
+    "buttons": [
+      "大众点评",
+      "美团",
+      "地图APP打开 📍",
+      "在地图看"
+    ],
+    "title": "mapLabel or name without parentheses; never append branchName",
+    "candidateDisplay": "all candidates in active area",
+    "targetCriteria": {
+      "radiusMeters": 1000,
+      "minCandidates": 5,
+      "minRating": 4,
+      "ratingScale": 5,
+      "popularityAlternative": true
+    },
+    "insufficientResults": "do not invent; report gap in planning review"
+  },
+  "tickets": {
+    "platforms": [
+      "美团",
+      "飞猪",
+      "携程"
+    ],
+    "showIf": "place.ticket and supplied booking/detail link"
+  },
+  "nearby": {
+    "default": "collapsed",
+    "thumbnailPx": [
+      112,
+      84
+    ],
+    "fields": "Place shared with scheduled attractions; only references differ"
+  },
+  "bottomNav": {
+    "buttons": [
+      "总览",
+      "地图",
+      "行程",
+      "吃饭"
+    ],
+    "overview": "scroll top, keep selected day",
+    "fontSizePx": 14,
+    "fontWeight": 700,
+    "buttonMinHeightPx": 36,
+    "radiusPx": 8
+  },
+  "missingOptional": "hide or blank; no new research during publishing",
+  "credentials": "reuse Cloudflare; never put security code in data or exported source",
+  "images": {
+    "handoff": "URLs only; no image files; no AI image generation required",
+    "render": "use provided URLs; do not search for replacements during publishing",
+    "referenceHtml": "remote photos; AMap credentials omitted; use online deployment for real maps"
+  }
+}

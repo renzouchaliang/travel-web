@@ -1,0 +1,1067 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:travel-web:handoff:1.0.0",
+  "title": "Travel handoff v1 review",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "formatVersion": {
+      "const": "1.0.0"
+    },
+    "templateVersion": {
+      "const": "travel-template-v1-r13"
+    },
+    "handoffStatus": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "ready",
+        "reference"
+      ]
+    },
+    "trip": {
+      "$ref": "#/$defs/Trip"
+    },
+    "publishAction": {
+      "type": "string",
+      "enum": [
+        "create",
+        "update"
+      ],
+      "description": "create新增攻略；update明确更新同一trip.id，不自动覆盖已有旅行。"
+    }
+  },
+  "required": [
+    "formatVersion",
+    "templateVersion",
+    "handoffStatus",
+    "trip",
+    "publishAction"
+  ],
+  "description": "旅行资料交接v1审阅稿；ready表示已完成前期讨论，允许进入发布流程。",
+  "$defs": {
+    "Source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^(https?://[^\\s]+|)$",
+          "description": "在线来源写URL；用户附件／内部资料无URL可用空字符串。"
+        },
+        "checkedAt": {
+          "type": "string",
+          "description": "核查日期或ISO时间。"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "url"
+      ]
+    },
+    "Coordinate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lng": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "crs": {
+          "type": "string",
+          "enum": [
+            "GCJ02",
+            "WGS84",
+            "BD09"
+          ]
+        }
+      },
+      "required": [
+        "lng",
+        "lat",
+        "crs"
+      ],
+      "description": "高德实际地图使用GCJ02；未知时省略整个对象，不填零坐标。"
+    },
+    "ExternalLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "description": "大众点评、美团、飞猪、携程、高德、官方等。"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "guide",
+            "reviews",
+            "official",
+            "booking",
+            "navigation",
+            "location",
+            "search"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "url": {
+          "type": "string",
+          "description": "已核实的 http(s) 链接。",
+          "pattern": "^https?://[^\\s]+$"
+        },
+        "targetType": {
+          "type": "string",
+          "enum": [
+            "detail",
+            "search",
+            "home"
+          ]
+        },
+        "navigationIntent": {
+          "type": "string",
+          "enum": [
+            "planned",
+            "current-location"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "platform",
+        "action",
+        "label",
+        "url",
+        "targetType"
+      ],
+      "description": "地点用location打开位置；购票用booking；搜索不当作精确门店／购票页。"
+    },
+    "Photo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "src": {
+          "type": "string",
+          "description": "可直接加载的网上http(s)图片URL；交接不附本地图片。",
+          "pattern": "^https?://[^\\s]+$"
+        },
+        "alt": {
+          "type": "string",
+          "description": "图片替代文字，写明地点和画面。"
+        },
+        "caption": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "sourceUrl": {
+          "type": "string",
+          "description": "已核实的 http(s) 链接。",
+          "pattern": "^https?://[^\\s]+$"
+        },
+        "author": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "rights": {
+          "type": "string",
+          "enum": [
+            "owned",
+            "licensed",
+            "permission",
+            "unknown"
+          ]
+        },
+        "licenseUrl": {
+          "type": "string",
+          "description": "已核实的 http(s) 链接。",
+          "pattern": "^https?://[^\\s]+$"
+        },
+        "displayAsReference": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "src",
+        "alt",
+        "rights"
+      ],
+      "description": "正式交接优先可发布图片。unknown不能默认展示；参考授权标记不可批量滥用。"
+    },
+    "PracticalFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "sourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+            "minLength": 1
+          },
+          "description": ""
+        },
+        "checkedAt": {
+          "type": "string",
+          "description": "核查日期或时间。"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "unverified"
+          ]
+        }
+      },
+      "required": [
+        "text",
+        "sourceIds",
+        "status"
+      ],
+      "description": "开放、门票、预约均用同一事实结构；元数据不显示在旅行正文。"
+    },
+    "Place": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "description": "完整地点或门店名称。",
+          "minLength": 1
+        },
+        "branchName": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "mapLabel": {
+          "type": "string",
+          "description": "展示短名，餐饮只写品牌／店名，不写分店括号。"
+        },
+        "mapRole": {
+          "type": "string",
+          "enum": [
+            "nearby"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "attraction",
+            "hotel",
+            "restaurant",
+            "station",
+            "airport",
+            "other"
+          ]
+        },
+        "coordinate": {
+          "$ref": "#/$defs/Coordinate"
+        },
+        "providerIds": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "高德公交必须提供amapCity，例如长沙市；可含POI ID。"
+        },
+        "address": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "areaId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "suggestedStayMinutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 0
+            },
+            "max": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "min",
+            "max"
+          ]
+        },
+        "opening": {
+          "$ref": "#/$defs/PracticalFact"
+        },
+        "openingMilestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "time": {
+                "type": "string",
+                "description": "当地时间 HH:mm。",
+                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+              },
+              "label": {
+                "type": "string",
+                "description": "面向旅行者的正文，未提供时省略。"
+              }
+            },
+            "required": [
+              "time",
+              "label"
+            ]
+          },
+          "description": ""
+        },
+        "ticket": {
+          "$ref": "#/$defs/PracticalFact"
+        },
+        "booking": {
+          "$ref": "#/$defs/PracticalFact"
+        },
+        "photos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Photo"
+          },
+          "description": ""
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExternalLink"
+          },
+          "description": ""
+        },
+        "foodTags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "面向旅行者的正文，未提供时省略。"
+          },
+          "description": ""
+        },
+        "rating": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0
+            },
+            "scale": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "platform": {
+              "type": "string",
+              "description": "面向旅行者的正文，未提供时省略。"
+            },
+            "reviewCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "checkedAt": {
+              "type": "string",
+              "description": "评分核查时间。"
+            },
+            "sourceUrl": {
+              "type": "string",
+              "description": "已核实的 http(s) 链接。",
+              "pattern": "^https?://[^\\s]+$"
+            }
+          },
+          "required": [
+            "value",
+            "scale",
+            "platform",
+            "checkedAt"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "photos",
+        "links"
+      ],
+      "description": "所有地点共用资料，是否进入日程由Day的引用决定。"
+    },
+    "IntercityTransport": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "direction": {
+          "type": "string",
+          "enum": [
+            "arrival",
+            "departure"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "rail",
+            "flight",
+            "coach"
+          ]
+        },
+        "origin": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "destination": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "departureTime": {
+          "type": "string",
+          "description": "当地时间 HH:mm。",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+        },
+        "arrivalTime": {
+          "type": "string",
+          "description": "当地时间 HH:mm。",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+        },
+        "serviceNumber": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "carriage": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "seat": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "terminal": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "gate": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "boardingDeadline": {
+          "type": "string",
+          "description": "当地时间 HH:mm。",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+        }
+      },
+      "required": [
+        "direction",
+        "mode"
+      ],
+      "description": "城际到达／离开放在停留卡片，不误作本地导航路段。"
+    },
+    "Stop": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "placeId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "startTime": {
+          "type": "string",
+          "description": "当地时间 HH:mm。",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "当地时间 HH:mm。",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+        },
+        "stayMinutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 0
+            },
+            "max": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "min",
+            "max"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "main",
+            "optional",
+            "free-time"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "description": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "timeLabel": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "mapOverview": {
+          "type": "boolean"
+        },
+        "transport": {
+          "$ref": "#/$defs/IntercityTransport"
+        },
+        "visitPurpose": {
+          "type": "string",
+          "enum": [
+            "sightseeing",
+            "photo",
+            "museum",
+            "park",
+            "free-time"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "placeId",
+        "role"
+      ],
+      "description": "一次访问一个地点；同一酒店多次访问使用不同Stop ID。机场车站mapOverview=false。"
+    },
+    "RouteLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "fromStopId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "toStopId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "walk",
+            "transit",
+            "drive",
+            "taxi",
+            "cycle"
+          ]
+        },
+        "navigationUrl": {
+          "type": "string",
+          "description": "已核实的 http(s) 链接。",
+          "pattern": "^https?://[^\\s]+$"
+        },
+        "viaPlaceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+            "minLength": 1
+          },
+          "description": ""
+        },
+        "routePolicy": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "summary": {
+          "type": "string",
+          "description": "已确定的交通说明，即使地图失败也可以执行。",
+          "minLength": 1
+        },
+        "directionHint": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "boarding": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "alighting": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "exitHint": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "plannedMinutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 0
+            },
+            "max": {
+              "type": "number",
+              "minimum": 0
+            },
+            "source": {
+              "type": "string",
+              "enum": [
+                "estimate",
+                "verified"
+              ]
+            }
+          },
+          "required": [
+            "min",
+            "max",
+            "source"
+          ]
+        },
+        "includeInOverview": {
+          "type": "boolean"
+        },
+        "mapDisplay": {
+          "type": "string",
+          "enum": [
+            "route",
+            "text-only"
+          ]
+        },
+        "preferredLine": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "routingFromPlaceId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "routingToPlaceId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "lineColor": {
+          "type": "string",
+          "description": "当地线路颜色，#RRGGBB。",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "sourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+            "minLength": 1
+          },
+          "description": ""
+        }
+      },
+      "required": [
+        "id",
+        "fromStopId",
+        "toStopId",
+        "mode",
+        "summary",
+        "includeInOverview",
+        "sourceIds"
+      ],
+      "description": "本地通勤独立卡片；城际高铁／航班使用Stop.transport，不能伪装成drive。"
+    },
+    "Distance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "meters": {
+          "type": "number",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "straight",
+            "walking",
+            "driving"
+          ]
+        },
+        "originPlaceId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "checkedAt": {
+          "type": "string",
+          "description": "测距核查时间。"
+        }
+      },
+      "required": [
+        "meters",
+        "kind",
+        "originPlaceId",
+        "source"
+      ],
+      "description": "标明测距起点与直线／步行／驾车，不能互换。"
+    },
+    "RestaurantGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "description": "酒店附近、书院附近等分区名。"
+        },
+        "anchorPlaceId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "placeId": {
+                "type": "string",
+                "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+                "minLength": 1
+              },
+              "distance": {
+                "$ref": "#/$defs/Distance"
+              }
+            },
+            "required": [
+              "placeId"
+            ]
+          },
+          "description": ""
+        },
+        "initialVisible": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "selectionCriteria": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "radiusMeters": {
+              "type": "number",
+              "minimum": 0
+            },
+            "minCandidates": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "platform": {
+              "type": "string",
+              "description": "面向旅行者的正文，未提供时省略。"
+            },
+            "minRating": {
+              "type": "number",
+              "minimum": 0
+            },
+            "ratingScale": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "popularityAlternative": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "radiusMeters",
+            "minCandidates",
+            "platform"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "anchorPlaceId",
+        "candidates",
+        "initialVisible"
+      ],
+      "description": "当前模板显示选中分区的全部候选；initialVisible保留数据字段，当前不控制隐藏。"
+    },
+    "DayVisual": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "poem": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "lines": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "面向旅行者的正文，未提供时省略。"
+              },
+              "description": "",
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "lines"
+          ],
+          "description": "一天一首2–4行短诗，缺失或空数组留白。"
+        },
+        "themeColor": {
+          "type": "string",
+          "description": "当天主题色。",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "headerImage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "src": {
+              "type": "string",
+              "description": "已核实的 http(s) 链接。",
+              "pattern": "^https?://[^\\s]+$"
+            },
+            "alt": {
+              "type": "string",
+              "description": "面向旅行者的正文，未提供时省略。"
+            },
+            "focalPoint": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ]
+            }
+          },
+          "required": [
+            "src",
+            "alt"
+          ],
+          "description": "每天代表性头图只填网上http(s) URL，不附图片文件；按固定高度自动裁切。"
+        }
+      },
+      "required": []
+    },
+    "Day": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "date": {
+          "type": "string",
+          "description": "当地日期 YYYY-MM-DD。",
+          "format": "date"
+        },
+        "title": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "directionSummary": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "stops": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Stop"
+          },
+          "description": ""
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RouteLeg"
+          },
+          "description": ""
+        },
+        "restaurantGroups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RestaurantGroup"
+          },
+          "description": ""
+        },
+        "nearbyPlaceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+            "minLength": 1
+          },
+          "description": ""
+        },
+        "returnPlaceId": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "面向旅行者的正文，未提供时省略。"
+          },
+          "description": ""
+        },
+        "visual": {
+          "$ref": "#/$defs/DayVisual"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "directionSummary",
+        "stops",
+        "legs",
+        "restaurantGroups",
+        "nearbyPlaceIds",
+        "alerts"
+      ],
+      "description": "按日期顺序排列；stops按访问顺序，legs按已决定的交通。"
+    },
+    "Trip": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "稳定、全局唯一的英文或拼音ID，引用用ID而非显示名称。",
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "description": "面向旅行者的正文，未提供时省略。"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA时区，例如Asia/Shanghai。",
+          "minLength": 1
+        },
+        "places": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Place"
+          }
+        },
+        "days": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Day"
+          },
+          "description": "",
+          "minItems": 1
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "description": ""
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "timezone",
+        "places",
+        "days",
+        "sources"
+      ]
+    }
+  }
+}

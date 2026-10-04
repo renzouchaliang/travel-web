@@ -1,0 +1,25 @@
+{
+  "formatVersion": "1.0.0",
+  "templateVersion": "travel-template-v1-r13",
+  "handoffStatus": "draft",
+  "trip": {
+    "id": "trip-example",
+    "title": "旅行标题",
+    "timezone": "Asia/Shanghai",
+    "places": {},
+    "days": [
+      {
+        "id": "day-1",
+        "title": "第一天",
+        "directionSummary": "",
+        "stops": [],
+        "legs": [],
+        "restaurantGroups": [],
+        "nearbyPlaceIds": [],
+        "alerts": []
+      }
+    ],
+    "sources": []
+  },
+  "publishAction": "create"
+}

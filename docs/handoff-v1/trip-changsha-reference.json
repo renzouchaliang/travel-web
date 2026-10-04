@@ -1,0 +1,1020 @@
+{
+  "formatVersion": "1.0.0",
+  "templateVersion": "travel-template-v1-r13",
+  "handoffStatus": "reference",
+  "trip": {
+    "id": "changsha-2026-10",
+    "title": "长沙旅行攻略",
+    "timezone": "Asia/Shanghai",
+    "places": {
+      "south": {
+        "id": "south",
+        "name": "长沙南站",
+        "kind": "station",
+        "coordinate": {
+          "lng": 113.06551,
+          "lat": 28.147093,
+          "crs": "GCJ02"
+        },
+        "providerIds": {
+          "amapCity": "长沙"
+        },
+        "links": [
+          {
+            "id": "south-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=113.06551%2C28.147093&name=%E9%95%BF%E6%B2%99%E5%8D%97%E7%AB%99&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ],
+        "photos": []
+      },
+      "hotel": {
+        "id": "hotel",
+        "name": "长沙滨江金融中心希尔顿欢朋酒店",
+        "kind": "hotel",
+        "address": "长沙市岳麓区观沙岭路龙湖铂金岛A座",
+        "coordinate": {
+          "lng": 112.95531,
+          "lat": 28.240356,
+          "crs": "GCJ02"
+        },
+        "providerIds": {
+          "amapCity": "长沙"
+        },
+        "links": [
+          {
+            "id": "hotel-link-2",
+            "platform": "官方",
+            "label": "官方信息",
+            "url": "https://www.hilton.com/zh-hans/hotels/csxshhx-hampton-changsha-binjiang-financial-center/hotel-location/",
+            "action": "official",
+            "targetType": "detail"
+          },
+          {
+            "id": "hotel-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://www.amap.com/place/B0IR474XZ1"
+          }
+        ],
+        "photos": [],
+        "summary": "2026-10-02 入住 · 2026-10-05 退房 · 3 晚"
+      },
+      "academy": {
+        "id": "academy",
+        "name": "岳麓书院",
+        "kind": "attraction",
+        "coordinate": {
+          "lng": 112.940805,
+          "lat": 28.180397,
+          "crs": "GCJ02"
+        },
+        "providerIds": {
+          "amapCity": "长沙"
+        },
+        "opening": {
+          "text": "5—10月常规开放时间，特殊安排以当天公告为准。",
+          "sourceIds": [
+            "v5"
+          ],
+          "status": "unverified"
+        },
+        "ticket": {
+          "text": "全价票40元；符合免票政策的游客也须预约。",
+          "sourceIds": [
+            "v5"
+          ],
+          "status": "unverified"
+        },
+        "links": [
+          {
+            "id": "academy-v5-guide",
+            "platform": "携程",
+            "label": "携程攻略",
+            "action": "guide",
+            "targetType": "detail",
+            "url": "https://gs.ctrip.com/html5/you/sight/changsha148/9013.html"
+          },
+          {
+            "id": "academy-v5-booking",
+            "platform": "官方",
+            "label": "官网预约",
+            "action": "booking",
+            "targetType": "detail",
+            "url": "https://ylsy.hnu.edu.cn/wbly/cgdn/zxdp.htm"
+          },
+          {
+            "id": "academy-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.940805%2C28.180397&name=%E5%B2%B3%E9%BA%93%E4%B9%A6%E9%99%A2&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ],
+        "photos": [
+          {
+            "id": "academy-image-reference",
+            "src": "https://img.rednet.cn/2022/10-12/633c6ab3-ce0b-4b1f-9b50-7142ccec7203.jpg",
+            "alt": "红网 · 岳麓书院资料图",
+            "caption": "红网 · 岳麓书院资料图",
+            "sourceUrl": "https://hn.rednet.cn/content/2022/10/12/11928392.html",
+            "author": "红网 · 岳麓书院资料图",
+            "rights": "unknown",
+            "displayAsReference": true
+          }
+        ],
+        "openingMilestones": [
+          {
+            "time": "17:30",
+            "label": "停止售票"
+          },
+          {
+            "time": "17:40",
+            "label": "停止入院"
+          },
+          {
+            "time": "18:00",
+            "label": "闭馆"
+          }
+        ],
+        "booking": {
+          "text": "微信搜索“岳麓书院”公众号预约，含当天可提前4天。入院携带预约使用的有效证件。",
+          "sourceIds": [
+            "v5"
+          ],
+          "status": "unverified"
+        }
+      },
+      "square": {
+        "id": "square",
+        "name": "东方红广场与湖南大学周边",
+        "mapLabel": "湖大广场",
+        "kind": "attraction",
+        "coordinate": {
+          "lng": 112.943877,
+          "lat": 28.179428,
+          "crs": "GCJ02"
+        },
+        "providerIds": {
+          "amapCity": "长沙"
+        },
+        "links": [
+          {
+            "id": "square-link-1",
+            "platform": "携程",
+            "label": "携程 · 携程攻略",
+            "url": "https://gs.ctrip.com/html5/you/sight/changsha148/1714337.html",
+            "action": "guide",
+            "targetType": "detail"
+          },
+          {
+            "id": "square-link-2",
+            "platform": "官方",
+            "label": "官方信息",
+            "url": "https://xyzh.hnu.edu.cn/info/1025/6034.htm",
+            "action": "official",
+            "targetType": "detail"
+          },
+          {
+            "id": "square-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.943877%2C28.179428&name=%E4%B8%9C%E6%96%B9%E7%BA%A2%E5%B9%BF%E5%9C%BA%E4%B8%8E%E6%B9%96%E5%8D%97%E5%A4%A7%E5%AD%A6%E5%91%A8%E8%BE%B9&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ],
+        "photos": [
+          {
+            "id": "square-image-reference",
+            "src": "https://xyzh.hnu.edu.cn/__local/6/55/57/DECF72CBFD8B009F0E4F07CEBD5_5D9258F9_437E4.jpg?e=.jpg",
+            "alt": "湖南大学 · 陈佳祺 摄",
+            "caption": "湖南大学 · 陈佳祺 摄",
+            "sourceUrl": "https://xyzh.hnu.edu.cn/info/1025/6034.htm",
+            "author": "湖南大学 · 陈佳祺 摄",
+            "rights": "unknown",
+            "displayAsReference": true
+          }
+        ]
+      },
+      "lushan-food": {
+        "id": "lushan-food",
+        "name": "麓山南路自由逛吃",
+        "mapLabel": "麓山南路逛吃",
+        "kind": "other",
+        "address": "麓山南路",
+        "providerIds": {
+          "amapCity": "长沙"
+        },
+        "links": [],
+        "photos": []
+      },
+      "yuelu-mountain": {
+        "id": "yuelu-mountain",
+        "name": "岳麓山",
+        "kind": "attraction",
+        "providerIds": {
+          "amapCity": "长沙"
+        },
+        "links": [],
+        "photos": []
+      },
+      "wuyi": {
+        "id": "wuyi",
+        "name": "五一广场",
+        "kind": "other",
+        "providerIds": {
+          "amapCity": "长沙"
+        },
+        "links": [],
+        "photos": []
+      },
+      "orange-isle": {
+        "id": "orange-isle",
+        "name": "橘子洲",
+        "kind": "attraction",
+        "providerIds": {
+          "amapCity": "长沙"
+        },
+        "links": [],
+        "photos": []
+      },
+      "haidilao": {
+        "id": "haidilao",
+        "name": "海底捞火锅（凯德壹中心店）",
+        "kind": "restaurant",
+        "areaId": "酒店附近 · 凯德壹中心",
+        "address": "凯德壹中心L2层19、20号",
+        "photos": [],
+        "links": [
+          {
+            "id": "haidilao-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/k5z02Y3gGMYiQZcY",
+            "action": "reviews",
+            "targetType": "detail"
+          }
+        ],
+        "foodTags": [
+          "火锅 · 可选清淡锅底"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。；未把商场入口距离作为具体门店距离。"
+      },
+      "zaka": {
+        "id": "zaka",
+        "name": "杂咖中西美食音乐餐厅（凯德壹中心店）",
+        "kind": "restaurant",
+        "areaId": "酒店附近 · 凯德壹中心",
+        "address": "凯德壹中心内",
+        "photos": [],
+        "links": [
+          {
+            "id": "zaka-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/E9HeBxOi6ZjZ6i3Q",
+            "action": "reviews",
+            "targetType": "detail"
+          }
+        ],
+        "foodTags": [
+          "牛排 · 意面"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。；未把商场入口距离作为具体门店距离。"
+      },
+      "feidachu": {
+        "id": "feidachu",
+        "name": "费大厨辣椒炒肉（凯德壹中心店）",
+        "kind": "restaurant",
+        "areaId": "酒店附近 · 凯德壹中心",
+        "address": "凯德壹中心4楼18号",
+        "photos": [],
+        "links": [
+          {
+            "id": "feidachu-link-1",
+            "platform": "携程",
+            "label": "携程 · 门店资料",
+            "url": "https://gs.ctrip.com/html5/you/foods/fooddetail/148/22538478.html",
+            "action": "guide",
+            "targetType": "detail"
+          }
+        ],
+        "foodTags": [
+          "辣椒炒肉 · 湘菜正餐"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。；未把商场入口距离作为具体门店距离。"
+      },
+      "hudashan": {
+        "id": "hudashan",
+        "name": "胡大山（凯德壹中心店）",
+        "kind": "restaurant",
+        "areaId": "酒店附近 · 凯德壹中心",
+        "photos": [],
+        "links": [
+          {
+            "id": "hudashan-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/126974080",
+            "action": "reviews",
+            "targetType": "detail"
+          }
+        ],
+        "foodTags": [
+          "豆腐佬汤 · 湘菜小炒"
+        ],
+        "summary": "保留为V5餐饮候选；资料较早，当前营业情况未确认，不是已确定用餐门店。；候选清单不代表已选定用餐；评分和实时营业情况未补造。；未把商场入口距离作为具体门店距离。"
+      },
+      "shaobing": {
+        "id": "shaobing",
+        "name": "包建斌帅哥烧饼（登高路门店）",
+        "kind": "restaurant",
+        "areaId": "书院与登高路",
+        "photos": [],
+        "links": [
+          {
+            "id": "shaobing-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/3207538",
+            "action": "reviews",
+            "targetType": "detail"
+          }
+        ],
+        "foodTags": [
+          "现烤烧饼"
+        ],
+        "summary": "公开门牌不一致，地址留null；具体门店地址需人工核实。；候选清单不代表已选定用餐；评分和实时营业情况未补造。"
+      },
+      "xiangqun": {
+        "id": "xiangqun",
+        "name": "向群锅饺（登高路店）",
+        "kind": "restaurant",
+        "areaId": "书院与登高路",
+        "address": "登高路46号",
+        "photos": [],
+        "links": [
+          {
+            "id": "xiangqun-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/k7gsBPPX7AZea2pv",
+            "action": "reviews",
+            "targetType": "detail"
+          }
+        ],
+        "foodTags": [
+          "锅饺"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。"
+      },
+      "changsha-2026-10-distance-origin-1": {
+        "id": "changsha-2026-10-distance-origin-1",
+        "name": "湖南大学地铁站2号口",
+        "kind": "other",
+        "photos": [],
+        "links": []
+      },
+      "chayan": {
+        "id": "chayan",
+        "name": "茶颜悦色（登高路上店）",
+        "kind": "restaurant",
+        "areaId": "书院与登高路",
+        "photos": [],
+        "links": [
+          {
+            "id": "chayan-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/k64XHWg6bjf02DUh",
+            "action": "reviews",
+            "targetType": "detail"
+          }
+        ],
+        "foodTags": [
+          "中式茶饮"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。"
+      },
+      "chagee": {
+        "id": "chagee",
+        "name": "霸王茶姬（长沙湖南大学登高路店）",
+        "kind": "restaurant",
+        "areaId": "书院与登高路",
+        "photos": [],
+        "links": [
+          {
+            "id": "chagee-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/l7F2B1eBsPYFTOcB",
+            "action": "reviews",
+            "targetType": "detail"
+          }
+        ],
+        "foodTags": [
+          "原叶鲜奶茶"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。"
+      },
+      "sugar": {
+        "id": "sugar",
+        "name": "老头子糖油粑粑（麓山南路158号门店）",
+        "kind": "restaurant",
+        "areaId": "麓山南路 · 向南慢慢逛",
+        "address": "麓山南路158号",
+        "coordinate": {
+          "lng": 112.945291,
+          "lat": 28.174192,
+          "crs": "GCJ02"
+        },
+        "photos": [],
+        "links": [
+          {
+            "id": "sugar-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/5657415",
+            "action": "reviews",
+            "targetType": "detail"
+          },
+          {
+            "id": "sugar-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.945291%2C28.174192&name=%E8%80%81%E5%A4%B4%E5%AD%90%E7%B3%96%E6%B2%B9%E7%B2%91%E7%B2%91%EF%BC%88%E9%BA%93%E5%B1%B1%E5%8D%97%E8%B7%AF158%E5%8F%B7%E9%97%A8%E5%BA%97%EF%BC%89&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ],
+        "foodTags": [
+          "糖油粑粑"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。"
+      },
+      "changsha-2026-10-distance-origin-2": {
+        "id": "changsha-2026-10-distance-origin-2",
+        "name": "东方红广场",
+        "kind": "other",
+        "photos": [],
+        "links": []
+      },
+      "noodle": {
+        "id": "noodle",
+        "name": "中原面吧（麓山南路店）",
+        "kind": "restaurant",
+        "areaId": "麓山南路 · 向南慢慢逛",
+        "address": "麓山南路140号",
+        "coordinate": {
+          "lng": 112.945163,
+          "lat": 28.174701,
+          "crs": "GCJ02"
+        },
+        "photos": [],
+        "links": [
+          {
+            "id": "noodle-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/3154960",
+            "action": "reviews",
+            "targetType": "detail"
+          },
+          {
+            "id": "noodle-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.945163%2C28.174701&name=%E4%B8%AD%E5%8E%9F%E9%9D%A2%E5%90%A7%EF%BC%88%E9%BA%93%E5%B1%B1%E5%8D%97%E8%B7%AF%E5%BA%97%EF%BC%89&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ],
+        "foodTags": [
+          "粉面 · 简单正餐"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。"
+      },
+      "beef": {
+        "id": "beef",
+        "name": "运栋天马牛肉饼（麓山南路228号门店）",
+        "kind": "restaurant",
+        "areaId": "麓山南路 · 向南慢慢逛",
+        "address": "麓山南路228号",
+        "coordinate": {
+          "lng": 112.945231,
+          "lat": 28.173301,
+          "crs": "GCJ02"
+        },
+        "photos": [],
+        "links": [
+          {
+            "id": "beef-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://www.amap.com/place/B0FFKV3KJB"
+          }
+        ],
+        "foodTags": [
+          "牛肉饼"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。"
+      },
+      "sushi": {
+        "id": "sushi",
+        "name": "鮨花道（麓山南路店）",
+        "kind": "restaurant",
+        "areaId": "麓山南路 · 向南慢慢逛",
+        "address": "麓山南路308号",
+        "coordinate": {
+          "lng": 112.944636,
+          "lat": 28.171595,
+          "crs": "GCJ02"
+        },
+        "photos": [],
+        "links": [
+          {
+            "id": "sushi-link-1",
+            "platform": "大众点评",
+            "label": "大众点评 · 大众点评",
+            "url": "https://www.dianping.com/shop/FYSLBeW8fUJJXjf1",
+            "action": "reviews",
+            "targetType": "detail"
+          },
+          {
+            "id": "sushi-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.944636%2C28.171595&name=%E9%AE%A8%E8%8A%B1%E9%81%93%EF%BC%88%E9%BA%93%E5%B1%B1%E5%8D%97%E8%B7%AF%E5%BA%97%EF%BC%89&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ],
+        "foodTags": [
+          "凯撒卷 · 牛油果鳗鱼寿司"
+        ],
+        "summary": "候选清单不代表已选定用餐；评分和实时营业情况未补造。"
+      },
+      "academy-entrance": {
+        "id": "academy-entrance",
+        "name": "赫曦台",
+        "kind": "other",
+        "mapRole": "nearby",
+        "summary": "书院入口附近，可顺路短停。",
+        "coordinate": {
+          "lng": 112.9416,
+          "lat": 28.18028,
+          "crs": "GCJ02"
+        },
+        "providerIds": {
+          "amapCity": "长沙市"
+        },
+        "photos": [],
+        "links": [
+          {
+            "id": "academy-entrance-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.9416%2C28.18028&name=%E8%B5%AB%E6%9B%A6%E5%8F%B0&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ]
+      },
+      "hnu-metro": {
+        "id": "hnu-metro",
+        "name": "湖南大学地铁站",
+        "kind": "other",
+        "coordinate": {
+          "lng": 112.946592,
+          "lat": 28.179689,
+          "crs": "GCJ02"
+        },
+        "providerIds": {
+          "amapCity": "长沙市"
+        },
+        "photos": [],
+        "links": [
+          {
+            "id": "hnu-metro-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.946592%2C28.179689&name=%E6%B9%96%E5%8D%97%E5%A4%A7%E5%AD%A6%E5%9C%B0%E9%93%81%E7%AB%99&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ]
+      },
+      "zibei": {
+        "id": "zibei",
+        "name": "自卑亭",
+        "kind": "other",
+        "mapRole": "nearby",
+        "summary": "东方红广场旁，可顺路看一看。",
+        "coordinate": {
+          "lng": 112.944523,
+          "lat": 28.179677,
+          "crs": "GCJ02"
+        },
+        "providerIds": {
+          "amapCity": "长沙市"
+        },
+        "photos": [],
+        "links": [
+          {
+            "id": "zibei-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.944523%2C28.179677&name=%E8%87%AA%E5%8D%91%E4%BA%AD&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ]
+      },
+      "hnu-stone": {
+        "id": "hnu-stone",
+        "name": "湖南大学石碑",
+        "kind": "other",
+        "mapRole": "nearby",
+        "summary": "广场以东，需要额外步行，可按体力选择。",
+        "coordinate": {
+          "lng": 112.952741,
+          "lat": 28.17883,
+          "crs": "GCJ02"
+        },
+        "providerIds": {
+          "amapCity": "长沙市"
+        },
+        "photos": [],
+        "links": [
+          {
+            "id": "hnu-stone-location",
+            "platform": "高德",
+            "action": "location",
+            "label": "高德地图打开",
+            "targetType": "detail",
+            "url": "https://uri.amap.com/marker?position=112.952741%2C28.17883&name=%E6%B9%96%E5%8D%97%E5%A4%A7%E5%AD%A6%E7%9F%B3%E7%A2%91&src=travel_web&coordinate=gaode&callnative=1"
+          }
+        ]
+      }
+    },
+    "days": [
+      {
+        "id": "changsha-2026-10-day-1",
+        "date": "2026-10-02",
+        "title": "抵达、入住、书院与湖大周边",
+        "directionSummary": "先到湘江西岸放行李，再向南去书院；湖大周边步行。",
+        "stops": [
+          {
+            "id": "d1-arrival",
+            "placeId": "south",
+            "startTime": "13:00",
+            "role": "main",
+            "mapOverview": false,
+            "transport": {
+              "direction": "arrival",
+              "mode": "rail",
+              "destination": "长沙南站",
+              "arrivalTime": "13:00"
+            },
+            "description": "10月2日13:00抵达，先去酒店。"
+          },
+          {
+            "id": "d1-hotel",
+            "placeId": "hotel",
+            "startTime": "14:00",
+            "endTime": "15:20",
+            "role": "main",
+            "mapOverview": true,
+            "description": "先放行李，再在附近用午饭。"
+          },
+          {
+            "id": "d1-academy",
+            "placeId": "academy",
+            "startTime": "16:00",
+            "stayMinutes": {
+              "min": 60,
+              "max": 90
+            },
+            "role": "main",
+            "mapOverview": true,
+            "description": "先游览有入场时限的书院，再去湖大周边。"
+          },
+          {
+            "id": "d1-square",
+            "placeId": "square",
+            "startTime": "17:15",
+            "role": "main",
+            "mapOverview": true,
+            "description": "广场、老建筑与登高路周边散步拍照。"
+          },
+          {
+            "id": "d1-food",
+            "placeId": "lushan-food",
+            "startTime": "18:00",
+            "role": "free-time",
+            "mapOverview": true,
+            "description": "从东方红广场向南，沿路自行选择餐饮，不固定全部打卡。"
+          },
+          {
+            "id": "d1-return",
+            "placeId": "hotel",
+            "role": "optional",
+            "mapOverview": true,
+            "description": "游览结束后返回酒店休息。"
+          }
+        ],
+        "legs": [
+          {
+            "id": "d1-l1",
+            "fromStopId": "d1-arrival",
+            "toStopId": "d1-hotel",
+            "mode": "transit",
+            "summary": "长沙火车南站乘地铁4号线往罐子岭方向至茶子山，出站步行到酒店，无需换乘。",
+            "mapDisplay": "text-only",
+            "preferredLine": "4号线",
+            "lineColor": "#775497",
+            "plannedMinutes": {
+              "min": 60,
+              "max": 90,
+              "source": "estimate"
+            },
+            "includeInOverview": false,
+            "sourceIds": [
+              "v5"
+            ]
+          },
+          {
+            "id": "d1-l2",
+            "fromStopId": "d1-hotel",
+            "toStopId": "d1-academy",
+            "mode": "transit",
+            "summary": "茶子山乘4号线往杜家坪方向，6站到湖南大学，建议2号口出站，步行至书院入口。",
+            "mapDisplay": "route",
+            "preferredLine": "4号线",
+            "lineColor": "#775497",
+            "plannedMinutes": {
+              "min": 35,
+              "max": 50,
+              "source": "estimate"
+            },
+            "includeInOverview": true,
+            "sourceIds": [
+              "v5"
+            ],
+            "routingToPlaceId": "academy-entrance"
+          },
+          {
+            "id": "d1-l3",
+            "fromStopId": "d1-academy",
+            "toStopId": "d1-square",
+            "mode": "walk",
+            "summary": "书院入口向东步行至东方红广场。",
+            "mapDisplay": "route",
+            "includeInOverview": true,
+            "sourceIds": [
+              "v5"
+            ],
+            "routingFromPlaceId": "academy-entrance"
+          },
+          {
+            "id": "d1-l4",
+            "fromStopId": "d1-square",
+            "toStopId": "d1-food",
+            "mode": "walk",
+            "summary": "由广场沿麓山南路向南自由逛吃，只标候选地点，不固定连线。",
+            "mapDisplay": "text-only",
+            "includeInOverview": false,
+            "sourceIds": [
+              "v5"
+            ]
+          },
+          {
+            "id": "d1-l5",
+            "fromStopId": "d1-food",
+            "toStopId": "d1-return",
+            "mode": "transit",
+            "summary": "自行返回湖南大学站，乘4号线往罐子岭方向，6站到茶子山后步行回酒店。",
+            "mapDisplay": "route",
+            "preferredLine": "4号线",
+            "lineColor": "#775497",
+            "includeInOverview": false,
+            "sourceIds": [
+              "v5"
+            ],
+            "routingFromPlaceId": "hnu-metro"
+          }
+        ],
+        "restaurantGroups": [
+          {
+            "id": "hotel-food",
+            "title": "酒店附近 · 凯德壹中心",
+            "anchorPlaceId": "hotel",
+            "initialVisible": 5,
+            "description": "先放行李，午饭在附近选一家。",
+            "candidates": [
+              {
+                "placeId": "haidilao"
+              },
+              {
+                "placeId": "zaka"
+              },
+              {
+                "placeId": "feidachu"
+              },
+              {
+                "placeId": "hudashan"
+              }
+            ]
+          },
+          {
+            "id": "denggao-food",
+            "title": "书院与登高路",
+            "anchorPlaceId": "square",
+            "initialVisible": 5,
+            "description": "按位置与体力选择，不必全部打卡。",
+            "candidates": [
+              {
+                "placeId": "shaobing"
+              },
+              {
+                "placeId": "xiangqun",
+                "distance": {
+                  "meters": 440,
+                  "kind": "walking",
+                  "originPlaceId": "changsha-2026-10-distance-origin-1",
+                  "source": "起点：湖南大学地铁站2号口；V5记录，非实时导航"
+                }
+              },
+              {
+                "placeId": "chayan"
+              },
+              {
+                "placeId": "chagee"
+              }
+            ]
+          },
+          {
+            "id": "lushan-food-group",
+            "title": "麓山南路 · 向南慢慢逛",
+            "anchorPlaceId": "square",
+            "initialVisible": 5,
+            "description": "按位置与体力选择，不必全部打卡。",
+            "candidates": [
+              {
+                "placeId": "sugar",
+                "distance": {
+                  "meters": 600,
+                  "kind": "straight",
+                  "originPlaceId": "changsha-2026-10-distance-origin-2",
+                  "source": "起点：东方红广场；V5约数，不是步行距离"
+                }
+              },
+              {
+                "placeId": "noodle",
+                "distance": {
+                  "meters": 540,
+                  "kind": "straight",
+                  "originPlaceId": "changsha-2026-10-distance-origin-2",
+                  "source": "起点：东方红广场；V5约数，不是步行距离"
+                }
+              },
+              {
+                "placeId": "beef",
+                "distance": {
+                  "meters": 690,
+                  "kind": "straight",
+                  "originPlaceId": "changsha-2026-10-distance-origin-2",
+                  "source": "起点：东方红广场；V5约数，不是步行距离"
+                }
+              },
+              {
+                "placeId": "sushi",
+                "distance": {
+                  "meters": 870,
+                  "kind": "straight",
+                  "originPlaceId": "changsha-2026-10-distance-origin-2",
+                  "source": "起点：东方红广场；V5约数，不是步行距离"
+                }
+              }
+            ]
+          }
+        ],
+        "nearbyPlaceIds": [
+          "academy-entrance",
+          "zibei",
+          "hnu-stone"
+        ],
+        "returnPlaceId": "hotel",
+        "alerts": [
+          "岳麓书院需预约，请按预约时段入院。"
+        ]
+      },
+      {
+        "id": "changsha-2026-10-day-2",
+        "date": "2026-10-03",
+        "title": "岳麓山、五一广场",
+        "directionSummary": "",
+        "stops": [
+          {
+            "id": "d2-mountain",
+            "placeId": "yuelu-mountain",
+            "role": "main",
+            "mapOverview": true,
+            "description": "10月3日上午已预约爬山；具体入口及山内路线未最终确认。",
+            "timeLabel": "上午"
+          },
+          {
+            "id": "d2-wuyi",
+            "placeId": "wuyi",
+            "role": "main",
+            "mapOverview": true,
+            "description": "10月3日安排；具体街区串联与到达时刻未确认。",
+            "note": "保留当天五一广场安排；不导入未经最终确认的黄兴路、坡子街等串联建议。"
+          }
+        ],
+        "legs": [],
+        "restaurantGroups": [],
+        "nearbyPlaceIds": [],
+        "alerts": []
+      },
+      {
+        "id": "changsha-2026-10-day-3",
+        "date": "2026-10-04",
+        "title": "行程待补充",
+        "directionSummary": "",
+        "stops": [],
+        "legs": [],
+        "restaurantGroups": [],
+        "nearbyPlaceIds": [],
+        "alerts": []
+      },
+      {
+        "id": "changsha-2026-10-day-4",
+        "date": "2026-10-05",
+        "title": "橘子洲、返程",
+        "directionSummary": "",
+        "stops": [
+          {
+            "id": "d4-orange",
+            "placeId": "orange-isle",
+            "role": "main",
+            "mapOverview": true,
+            "description": "10月5日上午已预约；具体入园时刻与游览路线未确认。",
+            "timeLabel": "上午"
+          },
+          {
+            "id": "d4-departure",
+            "placeId": "south",
+            "role": "main",
+            "mapOverview": false,
+            "transport": {
+              "direction": "departure",
+              "mode": "rail",
+              "origin": "长沙南站",
+              "departureTime": "20:40"
+            },
+            "description": "10月5日20:40高铁返程；到站时间尚未确认。",
+            "note": "高铁20:40发车不是到站时间；建议到站/离店时间未最终确认。"
+          }
+        ],
+        "legs": [],
+        "restaurantGroups": [],
+        "nearbyPlaceIds": [],
+        "returnPlaceId": "south",
+        "alerts": []
+      }
+    ],
+    "sources": [
+      {
+        "id": "v5",
+        "title": "长沙第一天_景点图文版_V5.html；资料提供方：项目已有资料；第一天最新保留路线、建议时刻、点位、餐饮候选及链接。",
+        "url": ""
+      },
+      {
+        "id": "confirmed-history",
+        "title": "项目中用户确认的行程记录；资料提供方：项目已有资料；2026-10-02的确认记录：2日13:00南站、住三晚、3日上午岳麓山及五一广场、4日待定、5日上午橘子洲和20:40返程；酒店后续澄清为希尔顿欢朋。",
+        "url": ""
+      },
+      {
+        "id": "family-guide",
+        "title": "长沙三天三晚亲子旅行攻略_中英双语.pdf；资料提供方：项目已有资料；辅助核对10月2日至5日日期范围与返程；未将其全部助手建议自动导入。",
+        "url": ""
+      },
+      {
+        "id": "previous-export",
+        "title": "changsha-trip.json；资料提供方：本项目已保存数据包；资料访问日期：2026-10-03（不代表实用信息核查日期）；本次字段转换与既有行程事实；本次未重新核验原始外部网页",
+        "url": ""
+      }
+    ]
+  },
+  "publishAction": "create"
+}

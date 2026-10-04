@@ -1,0 +1,18 @@
+{
+  "templateVersion": "travel-template-v1-r13",
+  "sourceCommit": "b12af99a2bb6b84ca7cbc2296a838d27735a36d5",
+  "sha256": {
+    "规划对话指令.md": "92b48ff461d7d7ae1c09f26ad3c516ae8170760080adfd4b4266184737d38c8e",
+    "长沙旅行攻略-样式参考.html": "3e2d4692c1ff886c4a4296f7b051cced35fd95d47f494804ff705003a601e80a",
+    "旅行规划-完整指令包.md": "0900d2bea2926b9e03092b3117e7b17b0a5c6a98e3198fbd6d36dce38a6d03f2",
+    "template-contract.json": "36f64333bc708b9e9b4fe9e06be5da387adfa82a25b3277e7ec1d7e5ea00407f",
+    "trip-template.json": "9f30e2e3a089a08466cc7d89f983cea72c40b99210fa50f347c0eb5b2a651ead",
+    "trip-changsha-reference.json": "66865008c68894f57791432f6befe3472dc878d66486e5c50d58cdd5367d58c8",
+    "交接手册.md": "96ef8ae8f01754154e2648f32f3744bbf29f6da8d98f1fb423488420f52327c7",
+    "travel-handoff.schema.json": "cbebcd0b7d12c891d887dbb9087db92dddeef3591ec2dec7f37d81168a37058d",
+    "README.md": "0379f7e893235a15b1e9e3af458eed3a25f66b4c86094294d11052ec0b691989",
+    "发布执行指令.md": "769f59d4fd2d700c95296a5e0e6cd8000bb1c2606bc33388f2720563583c2d01",
+    "模板源代码.zip": "5f9fd4358d97f41a708ac669a4c94d89bf6e82ee2897cdce85354a67d014fe68",
+    "模板代码参考.md": "8420b3f1e66a40f89e4cf02b67a900336ffc547d9272438dda41124a77ce5d1c"
+  }
+}
