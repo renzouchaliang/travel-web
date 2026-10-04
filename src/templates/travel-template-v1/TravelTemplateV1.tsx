@@ -90,26 +90,13 @@ export function NearbyPlaces({ trip, onMap }: { trip: Trip; onMap: (id: string) 
     return <details className="nearby-row" key={id}><summary>{place.name}</summary><div className="nearby-detail"><div><p>{place.summary}</p>{place.address && <p>{place.address}</p>}{([ ["开放", place.opening], ["门票", place.ticket], ["预约", place.booking] ] as const).map(([label, fact]) => fact && <p className="nearby-fact" key={label}>{label}：{fact.text}</p>)}</div><NearbyPhoto photos={place.photos} /></div><div className="card-actions"><button className="compact-map-button" onClick={() => onMap(id)}>在地图看</button><ExternalLinks links={place.links} /></div></details>;
   })}</section>;
 }
-export function MobileQuickNav({
-  trip,
-  day,
-  onReturn,
-}: {
-  trip: Trip;
-  day: Day;
-  onReturn: () => void;
-}) {
-  const target = day.returnPlaceId && trip.places[day.returnPlaceId];
+export function MobileQuickNav() {
   return (
     <nav className="mobile-quick-nav" aria-label="手机快捷导航">
+      <button onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>总览</button>
       <button onClick={() => scrollToSection("trip-map")}>地图</button>
       <button onClick={() => scrollToSection("itinerary")}>行程</button>
       <button onClick={() => scrollToSection("dining")}>吃饭</button>
-      {target && (
-        <button onClick={onReturn}>
-          {target.kind === "hotel" ? "回酒店" : "去终点"}
-        </button>
-      )}
     </nav>
   );
 }
@@ -229,21 +216,7 @@ export function TravelTemplateV1({
         selection.selectPlace(id, targetDay, true);
         requestAnimationFrame(() => scrollToSection("trip-map"));
       }} />
-      <MobileQuickNav
-        trip={trip}
-        day={day}
-        onReturn={() => {
-          if (day.returnPlaceId) {
-            const leg = day.legs.find(
-              (l) =>
-                trip.places[day.stops.find((s) => s.id === l.toStopId)!.placeId]
-                  .id === day.returnPlaceId && !l.includeInOverview,
-            );
-            if (leg) onLeg(leg.id);
-            else onMap(day.returnPlaceId);
-          }
-        }}
-      />
+      <MobileQuickNav />
     </main>
   );
 }

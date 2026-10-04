@@ -68,7 +68,7 @@ with sync_playwright() as p:
   if width<768:
    assert page.locator('.mobile-quick-nav button').first.bounding_box()['height']==36
    assert page.locator('.mobile-quick-nav button').first.evaluate('(e)=>getComputedStyle(e).fontWeight')=='700'
-   assert page.locator('.mobile-quick-nav button').first.evaluate('(e)=>getComputedStyle(e).borderRadius')=='0px'
+   assert page.locator('.mobile-quick-nav button').first.evaluate('(e)=>getComputedStyle(e).borderRadius')=='8px'
   assert page.locator('#nearby .nearby-photo').count()==0
   page.locator('.day-tabs [role=tab]').first.click()
   assert page.get_by_role('button',name='展开地图',exact=True).count()==0
@@ -166,8 +166,20 @@ with sync_playwright() as p:
   assert page.locator('.day-tabs [role=tab]').first.get_attribute('aria-selected')=='true'
   assert page.get_by_role('button',name='探索').get_attribute('aria-pressed')=='true'
   assert page.locator('.nearby-pin.active .travel-map-label').inner_text()=='自卑亭'
-  page.get_by_role('button',name='总览',exact=True).click()
+  page.locator('.map-controls').get_by_role('button',name='总览',exact=True).click()
   assert not page.locator('.travel-map-pin.active').count()
+  if width<768:
+   page.set_viewport_size({'width':width,'height':900})
+   nav=page.locator('.mobile-quick-nav')
+   assert nav.locator('button').all_inner_texts()==['总览','地图','行程','吃饭']
+   nav.get_by_role('button',name='吃饭',exact=True).click()
+   assert abs(page.locator('#dining').bounding_box()['y'])<2
+   nav.get_by_role('button',name='行程',exact=True).click()
+   assert abs(page.locator('#itinerary').bounding_box()['y'])<2
+   nav.get_by_role('button',name='地图',exact=True).click()
+   assert abs(page.locator('#trip-map').bounding_box()['y'])<2
+   nav.get_by_role('button',name='总览',exact=True).click()
+   assert page.evaluate('scrollY')==0
   if width==1440:
    page.route('**/__test_nearby.svg',lambda r:r.fulfill(status=200,content_type='image/svg+xml',body='<svg xmlns="http://www.w3.org/2000/svg" width="112" height="84"><rect width="112" height="84" fill="green"/></svg>'))
    page.evaluate("""async () => {

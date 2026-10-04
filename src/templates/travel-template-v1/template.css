@@ -614,8 +614,8 @@ body:has(.travel-template) {
 .trip-header .main-route { line-height:1.45; }
 @media (min-width:768px) { .travel-template .trip-header { height:208px; } }
 @media (min-width:1024px) { .travel-template .trip-header { height:224px; padding:24px 30px; } }
-.travel-template .mobile-quick-nav { gap:0; padding:3px 8px calc(3px + env(safe-area-inset-bottom)); box-shadow:none; }
-.travel-template .mobile-quick-nav button { min-height:36px; padding:4px 6px; font-size:14px; font-weight:700; line-height:1.3; border:0; border-radius:0; background:transparent; }
+.travel-template .mobile-quick-nav { gap:6px; padding:5px 8px calc(3px + env(safe-area-inset-bottom)); box-shadow:none; }
+.travel-template .mobile-quick-nav button { min-height:36px; padding:4px 6px; font-size:14px; font-weight:700; line-height:1.3; border:1px solid var(--travel-border); border-radius:8px; background:#edf4f1; }
 .travel-template a.location-link { display:inline-flex; align-items:center; justify-content:center; gap:3px; background:var(--travel-card); border:1px solid var(--travel-border); border-radius:9px; text-decoration:none; }
 .location-pin { font-size:11px; line-height:1; }
 .travel-template .map-panel.map-expanded { grid-template-rows:auto auto minmax(0,1fr); }
