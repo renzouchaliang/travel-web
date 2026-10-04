@@ -20,7 +20,7 @@ with sync_playwright() as p:
   assert page.locator('.day-tabs [role=tab]').count()==4
   colors=page.locator('.day-tabs [role=tab]').evaluate_all('(els)=>els.map(e=>getComputedStyle(e).getPropertyValue("--day-tab-color"))')
   assert len(set(colors))==4
-  assert page.locator('.map-controls button').all_inner_texts()==['总览','全屏','餐饮点','探索']
+  assert page.locator('.map-controls button').all_inner_texts()==['总览','餐饮点','探索','全屏']
   boxes=[button.bounding_box() for button in page.locator('.map-controls button').all()]
   assert len(set(round(box['y']) for box in boxes))==1
   assert page.locator('.map-equivalent').get_attribute('open') is None
@@ -64,6 +64,7 @@ with sync_playwright() as p:
   assert location_link.bounding_box()['height']==page.locator('.place-card button.compact-map-button').first.bounding_box()['height']
   if width<768:
    assert page.locator('.mobile-quick-nav button').first.bounding_box()['height']==36
+   assert page.locator('.mobile-quick-nav button').first.evaluate('(e)=>getComputedStyle(e).fontWeight')=='700'
    assert page.locator('.mobile-quick-nav button').first.evaluate('(e)=>getComputedStyle(e).borderRadius')=='0px'
   assert page.locator('#nearby .nearby-photo').count()==0
   page.locator('.day-tabs [role=tab]').first.click()
@@ -138,13 +139,21 @@ with sync_playwright() as p:
   assert page.locator('#stop-d1-academy .place-title-button').count()==0
   page.locator('.day-tabs [role=tab]').nth(2).click();assert page.get_by_text('这一天的行程待补充').is_visible();assert page.locator('.place-card').count()==0
   page.locator('.day-tabs [role=tab]').nth(1).click();assert page.locator('.place-card').count()>0
-  page.locator('.day-tabs [role=tab]').first.click();page.get_by_role('button',name='全屏',exact=True).click();assert page.get_by_role('dialog').count()==1; assert page.get_by_role('button',name='退出全屏 ✕').is_visible(); assert page.locator('.map-canvas-wrap').bounding_box()['height']>650; page.get_by_role('button',name='放大一级').click(); assert page.evaluate('window.mapChecks.zoom')>=16; page.screenshot(path=f'/tmp/travel-map-full-{width}.png');page.keyboard.press('Escape');assert page.get_by_role('dialog').count()==0
+  page.locator('.day-tabs [role=tab]').first.click();page.get_by_role('button',name='全屏',exact=True).click();assert page.get_by_role('dialog').count()==1; assert page.get_by_role('button',name='退出全屏').is_visible(); assert page.locator('.map-canvas-wrap').bounding_box()['height']>650; page.get_by_role('button',name='放大一级').click(); assert page.evaluate('window.mapChecks.zoom')>=16; page.screenshot(path=f'/tmp/travel-map-full-{width}.png');page.keyboard.press('Escape');assert page.get_by_role('dialog').count()==0
+  page.get_by_role('button',name='全屏',exact=True).click()
+  assert page.locator('.map-controls button').all_inner_texts()==['总览','餐饮点','探索','退出全屏']
+  boxes=[e.bounding_box() for e in page.locator('.map-controls button').all()]
+  assert len(set(round(box['y']) for box in boxes))==1
+  page.get_by_role('button',name='退出全屏',exact=True).click()
+  assert page.get_by_role('dialog').count()==0
   page.screenshot(path=f'/tmp/travel-v5-{width}.png',full_page=True)
   if width==390:
    page.set_viewport_size({'width':844,'height':390})
    page.get_by_role('button',name='全屏',exact=True).click()
    assert page.locator('.map-canvas-wrap').bounding_box()['height']>280
-   page.get_by_role('button',name='退出全屏 ✕').click()
+   boxes=[e.bounding_box() for e in page.locator('.map-controls button').all()]
+   assert len(set(round(box['y']) for box in boxes))==1
+   page.get_by_role('button',name='退出全屏').click()
    assert page.get_by_role('dialog').count()==0
   page.locator('.day-tabs [role=tab]').nth(3).click()
   assert page.get_by_text('20:40 出发',exact=True).is_visible()

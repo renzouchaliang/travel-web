@@ -239,7 +239,6 @@ export function TripMap({
       aria-modal={mapExpanded ? true : undefined}
       aria-label="当天地图"
     >
-      {mapExpanded && <div className="map-heading"><button className="map-exit" onClick={close}>退出全屏 ✕</button></div>}
       <MapControls
         selection={selection}
       />
